@@ -1,0 +1,8 @@
+go 1.22
+
+use (
+	./../../Core/Domic.Common
+	./../../Core/Domic.Domain
+	./../../Core/Domic.UseCase
+	.
+)
