@@ -12,7 +12,7 @@ func RegisterUserControllerActions(e *echo.Echo) {
 
 		command := Create.CreateCommand{FirstName: "", LastName: ""}
 
-		result := Create.CreateCommandHandler{}.Handle(&command)
+		result := Create.CreateCommandHandler(&command)
 
 		if result == true {
 			return c.String(http.StatusOK, "Hello, World!")

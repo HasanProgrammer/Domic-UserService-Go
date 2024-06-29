@@ -1,9 +1,11 @@
 package Create
 
-type CreateCommandHandler struct {
+type CreateCommand struct {
+	FirstName string
+	LastName  string
 }
 
-func (commandHandler CreateCommandHandler) Handle(command *CreateCommand) bool {
+func CreateCommandHandler(command *CreateCommand) bool {
 
 	return true
 }
