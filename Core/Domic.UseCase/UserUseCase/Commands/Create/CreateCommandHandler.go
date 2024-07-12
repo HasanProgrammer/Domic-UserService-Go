@@ -1,24 +1,30 @@
 package Create
 
 import (
-	"domic.domain/User/Contracts"
+	"domic.domain/User/Contracts/Interfaces"
 	"domic.domain/User/Entities"
 )
 
 type CreateCommandHandler struct {
-	UserRepository Contracts.IUserRepository
+	userRepository Interfaces.IUserRepository
 }
 
-func (createCommandHandler *CreateCommandHandler) Handle(command *CreateCommand) bool {
+func (createCommandHandler *CreateCommandHandler) HandleAsync(command *CreateCommand, result chan bool) {
 
-	result := createCommandHandler.UserRepository.Add(Entities.NewUser(command.FirstName, command.LastName))
+	newUser := Entities.NewUser(command.FirstName, command.LastName)
 
-	return result
+	channel := make(chan bool)
+
+	go createCommandHandler.userRepository.AddAsync(newUser, channel)
+
+	res := <-channel
+
+	result <- res
 
 }
 
-func NewCreateCommandHandler(UserRepository Contracts.IUserRepository) *CreateCommandHandler {
+func NewCreateCommandHandler(UserRepository Interfaces.IUserRepository) *CreateCommandHandler {
 	return &CreateCommandHandler{
-		UserRepository: UserRepository,
+		userRepository: UserRepository,
 	}
 }

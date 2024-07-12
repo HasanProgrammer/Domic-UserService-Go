@@ -2,20 +2,30 @@ package Controllers
 
 import (
 	"domic.usecase/UserUseCase/Commands/Create"
+	"github.com/labstack/echo/v4"
+	"time"
 )
 
 type UserController struct {
 	CreateCommandHandler *Create.CreateCommandHandler
 }
 
-func (userController *UserController) Get() bool {
+func (userController *UserController) AddAsync(context echo.Context, result chan bool) {
 
-	command := Create.CreateCommand{FirstName: "حسن", LastName: "کرمی محب"}
+	firstName := context.Param("FirstName")
+	lastName := context.Param("LastName")
 
-	result := userController.CreateCommandHandler.Handle(&command)
+	command := Create.CreateCommand{FirstName: firstName, LastName: lastName}
 
-	return result
+	time.Sleep(5 * time.Second)
 
+	channel := make(chan bool)
+
+	go userController.CreateCommandHandler.HandleAsync(&command, channel)
+
+	res := <-channel
+
+	result <- res
 }
 
 func NewUserController(CreateCommandHandler *Create.CreateCommandHandler) *UserController {

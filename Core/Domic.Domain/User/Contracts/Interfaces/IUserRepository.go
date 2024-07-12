@@ -1,10 +1,10 @@
-package Contracts
+package Interfaces
 
 import (
-	"domic.domain/Commons"
+	"domic.domain/Commons/Contracts/Interfaces"
 	"domic.domain/User/Entities"
 )
 
 type IUserRepository interface {
-	Commons.IRepository[*Entities.User]
+	Interfaces.IRepository[*Entities.User]
 }
