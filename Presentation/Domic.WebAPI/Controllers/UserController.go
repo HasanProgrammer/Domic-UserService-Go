@@ -11,7 +11,6 @@ type UserController struct {
 }
 
 func (userController *UserController) AddAsync(context echo.Context, result chan bool) {
-
 	firstName := context.Param("FirstName")
 	lastName := context.Param("LastName")
 
