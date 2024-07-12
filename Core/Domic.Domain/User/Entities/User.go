@@ -11,7 +11,7 @@ type User struct {
 }
 
 // AddEvent inherit of <IEntity>
-func (user User) AddEvent() {
+func (user *User) AddEvent() {
 
 }
 

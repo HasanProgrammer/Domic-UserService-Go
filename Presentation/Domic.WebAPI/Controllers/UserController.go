@@ -2,24 +2,24 @@ package Controllers
 
 import (
 	"domic.usecase/UserUseCase/Commands/Create"
-	"github.com/labstack/echo/v4"
-	"net/http"
 )
 
-func RegisterUserControllerActions(e *echo.Echo) {
+type UserController struct {
+	CreateCommandHandler *Create.CreateCommandHandler
+}
 
-	go e.GET("/", func(c echo.Context) error {
+func (userController *UserController) Get() bool {
 
-		command := Create.CreateCommand{FirstName: "", LastName: ""}
+	command := Create.CreateCommand{FirstName: "حسن", LastName: "کرمی محب"}
 
-		result := Create.CreateCommandHandler(&command)
+	result := userController.CreateCommandHandler.Handle(&command)
 
-		if result == true {
-			return c.String(http.StatusOK, "Hello, World!")
-		}
+	return result
 
-		return c.String(http.StatusBadRequest, "Hello, World!")
+}
 
-	})
-
+func NewUserController(CreateCommandHandler *Create.CreateCommandHandler) *UserController {
+	return &UserController{
+		CreateCommandHandler: CreateCommandHandler,
+	}
 }

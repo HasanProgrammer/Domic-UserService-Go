@@ -1,11 +1,24 @@
 package Create
 
-type CreateCommand struct {
-	FirstName string
-	LastName  string
+import (
+	"domic.domain/User/Contracts"
+	"domic.domain/User/Entities"
+)
+
+type CreateCommandHandler struct {
+	UserRepository Contracts.IUserRepository
 }
 
-func CreateCommandHandler(command *CreateCommand) bool {
+func (createCommandHandler *CreateCommandHandler) Handle(command *CreateCommand) bool {
 
-	return true
+	result := createCommandHandler.UserRepository.Add(Entities.NewUser(command.FirstName, command.LastName))
+
+	return result
+
+}
+
+func NewCreateCommandHandler(UserRepository Contracts.IUserRepository) *CreateCommandHandler {
+	return &CreateCommandHandler{
+		UserRepository: UserRepository,
+	}
 }

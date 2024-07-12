@@ -1,36 +1,23 @@
 package main
 
 import (
-	"UserService/Controllers"
+	"UserService/Routes"
 	"github.com/labstack/echo/v4"
-	"go.uber.org/dig"
 )
-
-type Dependencies struct {
-	Contract    interface{}
-	DriverClass interface{}
-	Token       string
-}
 
 func main() {
 
 	e := echo.New()
 
-	//DI
+	/*---------------------------------------------------------------*/
 
-	container := dig.New()
+	//APIs
 
-	var dependencies = []Dependencies{}
+	Routes.UserRoutesRegister(e)
 
-	for _, dep := range dependencies {
-		err := container.Provide(dep.DriverClass, dig.As(dep.Contract), dig.Name(dep.Token))
-		e.Logger.Printf(err.Error())
-	}
+	//APIs
 
-	//DI
+	/*---------------------------------------------------------------*/
 
-	Controllers.RegisterUserControllerActions(e)
-
-	e.Logger.Fatal(e.Start(":1323"))
-
+	e.Logger.Fatal(e.Start(":1996"))
 }

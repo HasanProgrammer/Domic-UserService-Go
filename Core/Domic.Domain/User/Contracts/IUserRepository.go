@@ -6,5 +6,5 @@ import (
 )
 
 type IUserRepository interface {
-	Commons.IRepository[Entities.User]
+	Commons.IRepository[*Entities.User]
 }
