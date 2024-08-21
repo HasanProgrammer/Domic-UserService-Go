@@ -1,0 +1,11 @@
+
+use (
+	"../../Infrastructure/Dotris.Infrastructure"
+	"../../Infrastructure/Dotris.Persistence"
+	"../../Core/Dotris.UseCase"
+	"../../Core/Dotris.Domain"
+	"../../Core/Dotris.Common"
+	.
+)
+
+go 1.23.0
