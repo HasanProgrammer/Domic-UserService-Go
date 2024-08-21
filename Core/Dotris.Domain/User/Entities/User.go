@@ -1,10 +1,12 @@
 package DomainUserEntity
 
 import (
+	"Dotris.Domain/Commons/Entities"
 	"errors"
 )
 
 type User struct {
+	events    []*DomainCommonEntity.Event
 	id        string
 	firstName string
 	lastName  string
@@ -14,8 +16,12 @@ type User struct {
 	isActive  bool
 }
 
-func (user *User) GetId() string {
+func (user *User) Id() string {
 	return user.id
+}
+
+func (user *User) Events() []*DomainCommonEntity.Event {
+	return user.events
 }
 
 func (user *User) Change(FirstName string, LastName string, Username string, Password string, Email string) {
@@ -45,7 +51,7 @@ func NewUser(Id string, FirstName string, LastName string, Username string, Pass
 	}
 
 	return &User{
-
+		id:        Id,
 		firstName: FirstName,
 		lastName:  LastName,
 		username:  Username,

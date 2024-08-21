@@ -44,7 +44,7 @@ func (userRepository *UserRepository) ChangeAsync(entity *DomainUserEntity.User,
 
 func (userRepository *UserRepository) Remove(entity *DomainUserEntity.User) error {
 
-	result := userRepository.db.Delete(entity, entity.GetId())
+	result := userRepository.db.Delete(entity, entity.Id())
 
 	return result.Error
 

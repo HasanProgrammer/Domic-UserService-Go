@@ -1,7 +1,11 @@
-package InfrastructureModelUser
+package InfrastructureModel
+
+import "gorm.io/gorm"
 
 type UserModel struct {
-	Id        string
+	gorm.Model
+
+	Id        string `gorm:"primaryKey"`
 	FirstName string
 	LastName  string
 	Username  string
