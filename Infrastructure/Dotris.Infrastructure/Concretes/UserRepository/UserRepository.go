@@ -58,19 +58,31 @@ func (userRepository *UserRepository) RemoveAsync(entity *DomainUserEntity.User,
 
 func (userRepository *UserRepository) FindById(id *string) (*DomainUserEntity.User, error) {
 
-	userRepository.db.Where()
+	var user *DomainUserEntity.User
 
-	return nil, nil
+	result := userRepository.db.First(user, "id = ?", id)
+
+	return user, result.Error
 }
 
 func (userRepository *UserRepository) FindByIdAsync(id *string, result chan DomainCommonDTO.Result[*DomainUserEntity.User]) {
 
+	//todo
+
 }
 
-func (userRepository *UserRepository) FindAll() ([]*DomainUserEntity.User, error) {
+func (userRepository *UserRepository) FindAll(pageSize int64, pageIndex int64) ([]*DomainUserEntity.User, error) {
+
 	return nil, nil
+
 }
 
-func (userRepository *UserRepository) FindAllAsync(result chan DomainCommonDTO.Result[[]*DomainUserEntity.User]) {
+func (userRepository *UserRepository) FindAllAsync(pageSize int64, pageIndex int64, result chan DomainCommonDTO.Result[[]*DomainUserEntity.User]) {
+
+}
+
+func (userRepository *UserRepository) Count(conditions ...interface{}) (int64, error) {
+
+	return 0, nil
 
 }

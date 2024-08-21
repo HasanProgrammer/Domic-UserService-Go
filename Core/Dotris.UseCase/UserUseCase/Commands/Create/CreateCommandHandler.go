@@ -17,7 +17,7 @@ func NewCreateCommandHandler(UserRepository DomainUserContract.IUserRepository, 
 	}
 }
 
-func (commandHandler *CreateCommandHandler) Handle() (bool, error) {
+func (commandHandler *CreateCommandHandler) Handle() error {
 
 	user, e := DomainUserEntity.NewUser(
 		"",
@@ -30,5 +30,5 @@ func (commandHandler *CreateCommandHandler) Handle() (bool, error) {
 
 	commandHandler.userRepository.Add(user)
 
-	return true, e
+	return e
 }
