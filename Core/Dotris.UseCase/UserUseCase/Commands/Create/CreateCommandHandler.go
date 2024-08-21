@@ -1,20 +1,19 @@
 package UseCaseUserCommand
 
 import (
+	DomainCommonContract "Dotris.Domain/Commons/Contracts"
 	"Dotris.Domain/User/Contracts"
 	"Dotris.Domain/User/Entities"
 )
 
 type CreateCommandHandler struct {
 	command        *CreateCommand
+	unitOfWork     DomainCommonContract.IUnitOfWork
 	userRepository DomainUserContract.IUserRepository
 }
 
-func NewCreateCommandHandler(UserRepository DomainUserContract.IUserRepository, Command *CreateCommand) *CreateCommandHandler {
-	return &CreateCommandHandler{
-		command:        Command,
-		userRepository: UserRepository,
-	}
+func NewCreateCommandHandler(command *CreateCommand, unitOfWork DomainCommonContract.IUnitOfWork, userRepository DomainUserContract.IUserRepository) *CreateCommandHandler {
+	return &CreateCommandHandler{userRepository: userRepository, unitOfWork: unitOfWork, command: command}
 }
 
 func (commandHandler *CreateCommandHandler) Handle() error {

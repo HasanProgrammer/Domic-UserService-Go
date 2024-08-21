@@ -1,4 +1,4 @@
-package InfrastructureConcretesRepository
+package InfrastructureConcreteRepository
 
 import (
 	"Dotris.Domain/Commons/DTOs"
