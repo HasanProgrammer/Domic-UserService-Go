@@ -1,40 +1,28 @@
 package UseCaseUserQuery
 
 import (
-	"Dotris.Domain/User/Contracts"
-	"Dotris.Domain/User/Entities"
-	"Dotris.UseCase/Commons/DTOs"
+	"Domic.Domain/Commons/DTOs"
+	"Domic.Domain/User/Contracts"
+	"Domic.Domain/User/Entities"
 )
 
 type FetchAllQueryHandler struct {
-	query          *FetchAllQuery
-	userRepository DomainUserContract.IUserRepository
+	userRepository DomainUserContract.IUserRepository[string]
 }
 
-func (handler *FetchAllQueryHandler) Handle() (*UseCaseCommonDTO.PaginationResponse[*DomainUserEntity.User], error) {
+func (handler *FetchAllQueryHandler) Handle(query *FetchAllQuery, result chan DomainCommonDTO.Result[DomainCommonDTO.PaginationResponse[[]*DomainUserEntity.User[string]]]) {
 
-	count, countError := handler.userRepository.Count()
+	queryChannel := make(chan DomainCommonDTO.PaginationResponse[[]*DomainUserEntity.User[string]])
 
-	if countError == nil {
-		return nil, countError
+	go handler.userRepository.FindAll(&query.PaginationRequest, queryChannel)
+
+	resultQuery := <-queryChannel
+
+	result <- DomainCommonDTO.Result[DomainCommonDTO.PaginationResponse[[]*DomainUserEntity.User[string]]]{
+		OutPut: resultQuery,
 	}
-
-	result, findAllError := handler.userRepository.FindAll(handler.query.PageSize, handler.query.PageIndex)
-
-	if findAllError == nil {
-		return nil, findAllError
-	}
-
-	return &UseCaseCommonDTO.PaginationResponse[*DomainUserEntity.User]{
-		PageIndex: handler.query.PageIndex,
-		PageSize:  handler.query.PageSize,
-		TotalItem: count,
-		Items:     result,
-		HasNext:   false,
-		HasPrev:   false,
-	}, nil
 }
 
-func NewFetchAllQueryHandler(Query *FetchAllQuery, UserRepository DomainUserContract.IUserRepository) *FetchAllQueryHandler {
-	return &FetchAllQueryHandler{query: Query, userRepository: UserRepository}
+func NewFetchAllQueryHandler(UserRepository DomainUserContract.IUserRepository[string]) *FetchAllQueryHandler {
+	return &FetchAllQueryHandler{userRepository: UserRepository}
 }

@@ -1,6 +1,8 @@
 package UseCaseUserQuery
 
-import UseCaseCommonDTO "Domic.UseCase/Commons/DTOs"
+import (
+	UseCaseCommonDTO "Domic.Domain/Commons/DTOs"
+)
 
 type FetchAllQuery struct {
 	UseCaseCommonDTO.PaginationRequest

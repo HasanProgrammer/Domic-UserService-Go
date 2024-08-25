@@ -1,6 +1,8 @@
 package DomainCommonContract
 
+import DomainCommonDTO "Domic.Domain/Commons/DTOs"
+
 type IUnitOfWork interface {
-	CommitTransaction() error
-	RollbackTransaction() error
+	CommitTransaction(result chan DomainCommonDTO.Result[bool])
+	RollbackTransaction(result chan DomainCommonDTO.Result[bool])
 }

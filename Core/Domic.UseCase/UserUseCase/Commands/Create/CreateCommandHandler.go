@@ -2,48 +2,92 @@ package UseCaseUserCommand
 
 import (
 	"Domic.Domain/Commons/Contracts"
+	"Domic.Domain/Commons/DTOs"
 	"Domic.Domain/User/Contracts"
 	"Domic.Domain/User/Entities"
 )
 
 type CreateCommandHandler struct {
-	command        *CreateCommand
 	unitOfWork     DomainCommonContract.IUnitOfWork
 	userRepository DomainUserContract.IUserRepository[string]
 }
 
-func NewCreateCommandHandler(command *CreateCommand, unitOfWork DomainCommonContract.IUnitOfWork, userRepository DomainUserContract.IUserRepository[string]) *CreateCommandHandler {
-	return &CreateCommandHandler{userRepository: userRepository, unitOfWork: unitOfWork, command: command}
-}
-
-func (commandHandler *CreateCommandHandler) Handle() error {
+func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, result chan DomainCommonDTO.Result[bool]) {
 
 	user, err := DomainUserEntity.NewUser[string](
 		"",
-		commandHandler.command.FirstName,
-		commandHandler.command.LastName,
-		commandHandler.command.Username,
-		commandHandler.command.Password,
-		commandHandler.command.Email,
+		command.FirstName,
+		command.LastName,
+		command.Username,
+		command.Password,
+		command.Email,
 		"",
 		"Admin",
 	)
 
 	if err != nil {
-		return err
+		result <- DomainCommonDTO.Result[bool]{
+			Error:  err,
+			OutPut: false,
+		}
+
+		return
 	}
 
-	err = commandHandler.userRepository.Add(user)
+	queryChannel := make(chan DomainCommonDTO.Result[bool])
 
-	if err != nil {
-		return err
+	go commandHandler.userRepository.Add(user, queryChannel)
+
+	queryResult := <-queryChannel
+
+	//event [OutBox] processing
+
+	//transaction section
+
+	transactionChannel := make(chan DomainCommonDTO.Result[bool])
+
+	if queryResult.Error != nil {
+
+		go commandHandler.unitOfWork.RollbackTransaction(transactionChannel)
+
+		transactionResult := <-transactionChannel
+
+		if transactionResult.Error != nil {
+			result <- DomainCommonDTO.Result[bool]{
+				Error:  transactionResult.Error,
+				OutPut: false,
+			}
+
+			return
+		}
+
+		result <- DomainCommonDTO.Result[bool]{
+			Error:  queryResult.Error,
+			OutPut: false,
+		}
+
 	}
 
-	err = commandHandler.unitOfWork.CommitTransaction()
+	go commandHandler.unitOfWork.CommitTransaction(transactionChannel)
 
-	if err != nil {
-		err = commandHandler.unitOfWork.RollbackTransaction()
+	transactionResult := <-transactionChannel
+
+	if transactionResult.Error != nil {
+		result <- DomainCommonDTO.Result[bool]{
+			Error:  transactionResult.Error,
+			OutPut: false,
+		}
+
+		return
 	}
 
-	return err
+	result <- DomainCommonDTO.Result[bool]{
+		Error:  nil,
+		OutPut: true,
+	}
+
+}
+
+func NewCreateCommandHandler(unitOfWork DomainCommonContract.IUnitOfWork, userRepository DomainUserContract.IUserRepository[string]) *CreateCommandHandler {
+	return &CreateCommandHandler{userRepository: userRepository, unitOfWork: unitOfWork}
 }

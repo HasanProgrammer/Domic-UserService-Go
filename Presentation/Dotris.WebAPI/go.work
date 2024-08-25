@@ -1,7 +1,7 @@
 
 use (
 	"./../../Infrastructure/Domic.Infrastructure"
-	"../../Infrastructure/Dotris.Persistence"
+	"../../Infrastructure/Domic.Persistence"
 	"./../../Core/Domic.UseCase"
 	"./../../Core/Domic.Domain"
 	"./../../Core/Domic.Common"

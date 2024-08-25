@@ -1,6 +1,6 @@
 package DomainCommonDTO
 
 type Result[TOutPut any] struct {
-	e      error
+	Error  error
 	OutPut TOutPut
 }

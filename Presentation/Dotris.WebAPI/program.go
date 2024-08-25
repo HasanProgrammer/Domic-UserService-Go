@@ -1,7 +1,9 @@
 package main
 
 import (
-	InfrastructureConcrete "Domic.Infrastructure/Concretes"
+	"Domic.Infrastructure/Concretes"
+	"Domic.Infrastructure/Concretes/UserRepository"
+	"Domic.UseCase/UserUseCase/Commands/Create"
 	"gorm.io/gorm"
 )
 
