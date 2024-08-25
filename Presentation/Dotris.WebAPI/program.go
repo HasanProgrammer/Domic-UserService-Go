@@ -1,20 +1,62 @@
 package main
 
 import (
+	"Domic.Domain/Commons/DTOs"
 	"Domic.Infrastructure/Concretes"
-	"Domic.Infrastructure/Concretes/UserRepository"
+	InfrastructureModel "Domic.Persistence/Models"
 	"Domic.UseCase/UserUseCase/Commands/Create"
+	"github.com/labstack/echo/v4"
+	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
+	"net/http"
 )
 
 func main() {
 
-	createCommand := UseCaseUserCommand.CreateCommand{}
-	unitOfWork := InfrastructureConcrete.NewUnitOfWork(&gorm.DB{})
-	userRepository := InfrastructureConcreteRepository.NewUserRepository(unitOfWork.Transaction())
+	e := echo.New()
 
-	createUserCommand := UseCaseUserCommand.NewCreateCommandHandler(&createCommand, unitOfWork, userRepository)
+	go e.GET("user/create", func(c echo.Context) error {
 
-	createUserCommand.Handle()
+		commandChannel := make(chan DomainCommonDTO.Results[bool])
+
+		db, err := gorm.Open(sqlserver.Open("sqlserver://sa:Domic123!@#@127.0.0.1:1633?database=UserService"), &gorm.Config{})
+
+		if err != nil {
+
+		}
+
+		db.AutoMigrate(&InfrastructureModel.EventModel{})
+		db.AutoMigrate(&InfrastructureModel.UserModel{})
+
+		createCommand := UseCaseUserCommand.CreateCommand{
+			FirstName: "حسن",
+			LastName:  "کرمی محب",
+			Username:  "hasan_karami_moheb",
+			Password:  "123456",
+			Email:     "hasan_karami_moheb@gmail.com",
+		}
+
+		unitOfWork := InfrastructureConcrete.NewUnitOfWork(db)
+		transaction := unitOfWork.Transaction()
+
+		createUserCommand := UseCaseUserCommand.NewCreateCommandHandler(
+			unitOfWork,
+			InfrastructureConcrete.NewUserRepository(transaction),
+			InfrastructureConcrete.NewEventRepository(transaction),
+		)
+
+		createUserCommand.Handle(&createCommand, commandChannel)
+
+		commandResult := <-commandChannel
+
+		if !commandResult.OutPut {
+			return c.String(http.StatusOK, "Error")
+		}
+
+		return c.String(http.StatusOK, "Successfully Created!")
+
+	})
+
+	e.Logger.Fatal(e.Start(":1323"))
 
 }

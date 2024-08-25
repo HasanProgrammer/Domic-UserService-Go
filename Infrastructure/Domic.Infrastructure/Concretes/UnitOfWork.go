@@ -1,6 +1,7 @@
 package InfrastructureConcrete
 
 import (
+	"Domic.Domain/Commons/DTOs"
 	"gorm.io/gorm"
 )
 
@@ -13,23 +14,49 @@ func (u *UnitOfWork) Transaction() *gorm.DB {
 	return u.transaction
 }
 
-func (u *UnitOfWork) CommitTransaction() error {
+func (u *UnitOfWork) CommitTransaction(result chan DomainCommonDTO.Result[bool]) {
+
+	commitChannel := make(chan DomainCommonDTO.Result[bool])
 
 	if u.transaction != nil {
-		u.transaction.Commit()
+
+		go func() {
+			queryResult := u.transaction.Commit()
+
+			commitChannel <- DomainCommonDTO.Result[bool]{
+				Error:  queryResult.Error,
+				OutPut: true,
+			}
+		}()
+
 	}
 
-	return nil
+	commitResult := <-commitChannel
+
+	result <- commitResult
 
 }
 
-func (u *UnitOfWork) RollbackTransaction() error {
+func (u *UnitOfWork) RollbackTransaction(result chan DomainCommonDTO.Result[bool]) {
+
+	rollBackChannel := make(chan DomainCommonDTO.Result[bool])
 
 	if u.transaction != nil {
-		u.transaction.Rollback()
+
+		go func() {
+			queryResult := u.transaction.Rollback()
+
+			rollBackChannel <- DomainCommonDTO.Result[bool]{
+				Error:  queryResult.Error,
+				OutPut: true,
+			}
+		}()
+
 	}
 
-	return nil
+	commitResult := <-rollBackChannel
+
+	result <- commitResult
 
 }
 

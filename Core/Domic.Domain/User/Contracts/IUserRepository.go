@@ -6,5 +6,5 @@ import (
 )
 
 type IUserRepository[TIdentity any] interface {
-	DomainCommonContract.IRepository[*string, *DomainUserEntity.User[TIdentity]]
+	DomainCommonContract.IRepository[TIdentity, *DomainUserEntity.User[TIdentity]]
 }

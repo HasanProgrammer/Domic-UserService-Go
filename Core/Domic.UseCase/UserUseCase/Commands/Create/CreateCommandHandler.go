@@ -3,16 +3,20 @@ package UseCaseUserCommand
 import (
 	"Domic.Domain/Commons/Contracts"
 	"Domic.Domain/Commons/DTOs"
+	"Domic.Domain/Commons/Entities"
 	"Domic.Domain/User/Contracts"
 	"Domic.Domain/User/Entities"
 )
 
 type CreateCommandHandler struct {
-	unitOfWork     DomainCommonContract.IUnitOfWork
-	userRepository DomainUserContract.IUserRepository[string]
+	unitOfWork      DomainCommonContract.IUnitOfWork
+	userRepository  DomainUserContract.IUserRepository[string]
+	eventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event[string]]
 }
 
-func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, result chan DomainCommonDTO.Result[bool]) {
+func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, result chan DomainCommonDTO.Results[bool]) {
+
+	var errors []error
 
 	user, err := DomainUserEntity.NewUser[string](
 		"",
@@ -26,68 +30,94 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 	)
 
 	if err != nil {
-		result <- DomainCommonDTO.Result[bool]{
-			Error:  err,
+		result <- DomainCommonDTO.Results[bool]{
+			Errors: append(errors, err),
 			OutPut: false,
 		}
 
 		return
 	}
 
+	//user creation
+
 	queryChannel := make(chan DomainCommonDTO.Result[bool])
 
 	go commandHandler.userRepository.Add(user, queryChannel)
 
-	queryResult := <-queryChannel
+	addUserQueryResult := <-queryChannel
 
-	//event [OutBox] processing
+	if addUserQueryResult.Error != nil {
+		errors = append(errors, addUserQueryResult.Error)
+	}
+
+	//event creation
+
+	go commandHandler.eventRepository.AddRange(user.Events(), queryChannel)
+
+	addEventQueryResult := <-queryChannel
+
+	if addEventQueryResult.Error != nil {
+		errors = append(errors, addEventQueryResult.Error)
+	}
 
 	//transaction section
 
-	transactionChannel := make(chan DomainCommonDTO.Result[bool])
+	if len(errors) > 0 {
 
-	if queryResult.Error != nil {
+		go commandHandler.unitOfWork.RollbackTransaction(queryChannel)
 
-		go commandHandler.unitOfWork.RollbackTransaction(transactionChannel)
-
-		transactionResult := <-transactionChannel
+		transactionResult := <-queryChannel
 
 		if transactionResult.Error != nil {
-			result <- DomainCommonDTO.Result[bool]{
-				Error:  transactionResult.Error,
+			result <- DomainCommonDTO.Results[bool]{
+				Errors: append(errors, transactionResult.Error),
 				OutPut: false,
 			}
 
 			return
 		}
 
-		result <- DomainCommonDTO.Result[bool]{
-			Error:  queryResult.Error,
+		result <- DomainCommonDTO.Results[bool]{
+			Errors: errors,
 			OutPut: false,
 		}
 
 	}
 
-	go commandHandler.unitOfWork.CommitTransaction(transactionChannel)
+	go commandHandler.unitOfWork.CommitTransaction(queryChannel)
 
-	transactionResult := <-transactionChannel
+	transactionResult := <-queryChannel
 
 	if transactionResult.Error != nil {
-		result <- DomainCommonDTO.Result[bool]{
-			Error:  transactionResult.Error,
+		errors = append(errors, transactionResult.Error)
+	}
+
+	if len(errors) > 0 {
+		result <- DomainCommonDTO.Results[bool]{
+			Errors: errors,
 			OutPut: false,
 		}
 
 		return
 	}
 
-	result <- DomainCommonDTO.Result[bool]{
-		Error:  nil,
+	result <- DomainCommonDTO.Results[bool]{
+		Errors: nil,
 		OutPut: true,
 	}
 
 }
 
-func NewCreateCommandHandler(unitOfWork DomainCommonContract.IUnitOfWork, userRepository DomainUserContract.IUserRepository[string]) *CreateCommandHandler {
-	return &CreateCommandHandler{userRepository: userRepository, unitOfWork: unitOfWork}
+func NewCreateCommandHandler(
+	UnitOfWork DomainCommonContract.IUnitOfWork,
+	UserRepository DomainUserContract.IUserRepository[string],
+	EventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event[string]],
+) *CreateCommandHandler {
+
+	return &CreateCommandHandler{
+		unitOfWork:      UnitOfWork,
+		userRepository:  UserRepository,
+		eventRepository: EventRepository,
+	}
+
 }
