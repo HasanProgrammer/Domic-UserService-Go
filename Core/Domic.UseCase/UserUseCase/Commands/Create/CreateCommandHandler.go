@@ -62,7 +62,7 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 
 	if len(errors) > 0 {
 
-		go commandHandler.unitOfWork.RollbackTransaction(queryChannel)
+		go commandHandler.unitOfWork.Rollback(queryChannel)
 
 		transactionResult := <-queryChannel
 
@@ -80,7 +80,7 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 
 	}
 
-	go commandHandler.unitOfWork.CommitTransaction(queryChannel)
+	go commandHandler.unitOfWork.Commit(queryChannel)
 
 	transactionResult := <-queryChannel
 

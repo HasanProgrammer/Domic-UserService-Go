@@ -85,7 +85,9 @@ func (eventRepository *EventRepository) FindById(id string, result chan DomainCo
 
 }
 
-func (eventRepository *EventRepository) FindAll(paginationRequest *DomainCommonDTO.PaginationRequest, result chan DomainCommonDTO.PaginationResponse[*DomainCommonEntity.Event]) {
+func (eventRepository *EventRepository) FindAll(paginationRequest *DomainCommonDTO.PaginationRequest,
+	result chan DomainCommonDTO.PaginationResponse[*DomainCommonEntity.Event],
+) {
 
 }
 

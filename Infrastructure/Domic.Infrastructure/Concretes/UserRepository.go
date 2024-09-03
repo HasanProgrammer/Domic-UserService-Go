@@ -83,6 +83,6 @@ func (userRepository *UserRepository) FindAll(paginationRequest *DomainCommonDTO
 
 }
 
-func NewUserRepository(Db *gorm.DB) *UserRepository {
-	return &UserRepository{db: Db}
+func NewUserRepository(db *gorm.DB) *UserRepository {
+	return &UserRepository{db: db}
 }

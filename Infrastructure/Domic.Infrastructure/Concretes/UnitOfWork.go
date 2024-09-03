@@ -6,15 +6,15 @@ import (
 )
 
 type UnitOfWork struct {
+	db    		*gorm.DB
 	transaction *gorm.DB
-	db          *gorm.DB
 }
 
-func (u *UnitOfWork) Transaction() *gorm.DB {
+func (u *UnitOfWork) GetTransaction() *gorm.DB {
 	return u.transaction
 }
 
-func (u *UnitOfWork) CommitTransaction(result chan DomainCommonDTO.Result[bool]) {
+func (u *UnitOfWork) Commit(result chan DomainCommonDTO.Result[bool]) {
 
 	if u.transaction != nil {
 
@@ -31,7 +31,7 @@ func (u *UnitOfWork) CommitTransaction(result chan DomainCommonDTO.Result[bool])
 
 }
 
-func (u *UnitOfWork) RollbackTransaction(result chan DomainCommonDTO.Result[bool]) {
+func (u *UnitOfWork) Rollback(result chan DomainCommonDTO.Result[bool]) {
 
 	if u.transaction != nil {
 

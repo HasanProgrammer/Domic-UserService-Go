@@ -1,23 +1,27 @@
 package Persistence
 
 import (
+	"Domic.Persistence/Models"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
 
 type SqlContext struct {
-	connectionString string
+	db *gorm.DB
 }
 
 func (sqlContext *SqlContext) GetContext() *gorm.DB {
-	db, err := gorm.Open(sqlserver.Open(sqlContext.connectionString), &gorm.Config{})
+	return sqlContext.db
+}
+
+func NewSqlContext(connectionString string) *SqlContext {
+	db, err := gorm.Open(sqlserver.Open(connectionString), &gorm.Config{})
+
+	db.AutoMigrate(&InfrastructureModel.EventModel{})
+	db.AutoMigrate(&InfrastructureModel.UserModel{})
 
 	if err != nil {
 	}
 
-	return db
-}
-
-func NewSqlContext(connectionString string) *SqlContext {
-	return &SqlContext{connectionString: connectionString}
+	return &SqlContext{db: db}
 }
