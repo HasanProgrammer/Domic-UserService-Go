@@ -3,11 +3,10 @@ package main
 import (
 	"Domic.Domain/Commons/DTOs"
 	"Domic.Infrastructure/Concretes"
+	"Domic.Persistence"
 	"Domic.Persistence/Models"
 	"Domic.UseCase/UserUseCase/Commands/Create"
 	"github.com/labstack/echo/v4"
-	"gorm.io/driver/sqlserver"
-	"gorm.io/gorm"
 	"net/http"
 )
 
@@ -15,18 +14,14 @@ func main() {
 
 	e := echo.New()
 
+	db := Persistence.NewSqlContext("sqlserver://sa:Domic123@127.0.0.1:1633?database=UserService").GetContext()
+
+	db.AutoMigrate(&InfrastructureModel.EventModel{})
+	db.AutoMigrate(&InfrastructureModel.UserModel{})
+
 	go e.GET("user/create", func(c echo.Context) error {
 
 		commandChannel := make(chan DomainCommonDTO.Results[bool])
-
-		db, err := gorm.Open(sqlserver.Open("sqlserver://sa:Domic123@127.0.0.1:1633?database=UserService"), &gorm.Config{})
-
-		if err != nil {
-
-		}
-
-		db.AutoMigrate(&InfrastructureModel.EventModel{})
-		db.AutoMigrate(&InfrastructureModel.UserModel{})
 
 		createCommand := UseCaseUserCommand.CreateCommand{
 			FirstName: "حسن",
@@ -37,12 +32,11 @@ func main() {
 		}
 
 		unitOfWork := InfrastructureConcrete.NewUnitOfWork(db)
-		transaction := unitOfWork.Transaction()
 
 		createUserCommand := UseCaseUserCommand.NewCreateCommandHandler(
 			unitOfWork,
-			InfrastructureConcrete.NewUserRepository(transaction),
-			InfrastructureConcrete.NewEventRepository(transaction),
+			InfrastructureConcrete.NewUserRepository(unitOfWork.Transaction()),
+			InfrastructureConcrete.NewEventRepository(unitOfWork.Transaction()),
 		)
 
 		go createUserCommand.Handle(&createCommand, commandChannel)
