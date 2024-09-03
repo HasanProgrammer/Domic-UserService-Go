@@ -6,9 +6,9 @@ import (
 	"time"
 )
 
-type User[TIdentity any] struct {
-	events    []*DomainCommonEntity.Event[TIdentity]
-	id        TIdentity
+type User struct {
+	events    []*DomainCommonEntity.Event
+	id        string
 	firstName string
 	lastName  string
 	username  string
@@ -19,47 +19,70 @@ type User[TIdentity any] struct {
 	//audit fields
 
 	createdAt   time.Time
-	createdBy   TIdentity
+	createdBy   string
 	createdRole string
-
 	updatedAt   *time.Time
-	updatedBy   TIdentity
+	updatedBy   string
 	updatedRole *string
 }
 
-func (u *User[TIdentity]) Events() []*DomainCommonEntity.Event[TIdentity] {
+func (u *User) GetEvents() []*DomainCommonEntity.Event {
 	return u.events
 }
 
-func (u *User[TIdentity]) Id() TIdentity {
+func (u *User) GetId() string {
 	return u.id
 }
 
-func (u *User[TIdentity]) FirstName() string {
+func (u *User) GetFirstName() string {
 	return u.firstName
 }
 
-func (u *User[TIdentity]) LastName() string {
+func (u *User) GetLastName() string {
 	return u.lastName
 }
 
-func (u *User[TIdentity]) Username() string {
+func (u *User) GetUsername() string {
 	return u.username
 }
 
-func (u *User[TIdentity]) Password() string {
+func (u *User) GetPassword() string {
 	return u.password
 }
 
-func (u *User[TIdentity]) Email() string {
+func (u *User) GetEmail() string {
 	return u.email
 }
 
-func (u *User[TIdentity]) IsActive() bool {
+func (u *User) GetIsActive() bool {
 	return u.isActive
 }
 
-func NewUser[TIdentity any](id TIdentity, firstName string, lastName string, username string, password string, email string, createdBy TIdentity, createdRole string) (*User[TIdentity], error) {
+func (u *User) GetCreatedAt() time.Time {
+	return u.createdAt
+}
+
+func (u *User) GetCreatedBy() string {
+	return u.createdBy
+}
+
+func (u *User) GetCreatedRole() string {
+	return u.createdRole
+}
+
+func (u *User) GetUpdatedAt() *time.Time {
+	return u.updatedAt
+}
+
+func (u *User) GetUpdatedBy() string {
+	return u.updatedBy
+}
+
+func (u *User) GetUpdatedRole() *string {
+	return u.updatedRole
+}
+
+func NewUser(id string, firstName string, lastName string, username string, password string, email string, createdBy string, createdRole string) (*User, error) {
 
 	if len(firstName) >= 100 {
 		return nil, errors.New("")
@@ -71,7 +94,7 @@ func NewUser[TIdentity any](id TIdentity, firstName string, lastName string, use
 
 	nowTime := time.Now()
 
-	user := &User[TIdentity]{
+	user := &User{
 		id:          id,
 		firstName:   firstName,
 		lastName:    lastName,
@@ -86,7 +109,7 @@ func NewUser[TIdentity any](id TIdentity, firstName string, lastName string, use
 	//producing event
 
 	user.events = append(user.events,
-		DomainCommonEntity.NewEvent[TIdentity]("", "UserCreated", "User", "Create", "", nowTime, createdBy, createdRole),
+		DomainCommonEntity.NewEvent("", "UserCreated", "User", "Create", "", nowTime, createdBy, createdRole),
 	)
 
 	return user, nil

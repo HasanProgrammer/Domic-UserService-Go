@@ -3,7 +3,7 @@ package main
 import (
 	"Domic.Domain/Commons/DTOs"
 	"Domic.Infrastructure/Concretes"
-	InfrastructureModel "Domic.Persistence/Models"
+	"Domic.Persistence/Models"
 	"Domic.UseCase/UserUseCase/Commands/Create"
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/sqlserver"
@@ -19,7 +19,7 @@ func main() {
 
 		commandChannel := make(chan DomainCommonDTO.Results[bool])
 
-		db, err := gorm.Open(sqlserver.Open("sqlserver://sa:Domic123!@#@127.0.0.1:1633?database=UserService"), &gorm.Config{})
+		db, err := gorm.Open(sqlserver.Open("sqlserver://sa:Domic123@127.0.0.1:1633?database=UserService"), &gorm.Config{})
 
 		if err != nil {
 
@@ -45,11 +45,11 @@ func main() {
 			InfrastructureConcrete.NewEventRepository(transaction),
 		)
 
-		createUserCommand.Handle(&createCommand, commandChannel)
+		go createUserCommand.Handle(&createCommand, commandChannel)
 
 		commandResult := <-commandChannel
 
-		if !commandResult.OutPut {
+		if !commandResult.Result {
 			return c.String(http.StatusOK, "Error")
 		}
 

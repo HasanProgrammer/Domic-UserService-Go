@@ -11,90 +11,78 @@ type UserRepository struct {
 	db *gorm.DB
 }
 
-func (userRepository *UserRepository) Add(entity *DomainUserEntity.User[string], result chan DomainCommonDTO.Result[bool]) {
-
-	queryChannel := make(chan DomainCommonDTO.Result[bool])
+func (userRepository *UserRepository) Add(entity *DomainUserEntity.User, result chan DomainCommonDTO.Result[bool]) {
 
 	go func() {
 
 		model := InfrastructureModel.UserModel{
-			Id:        entity.Id(),
-			FirstName: entity.FirstName(),
-			LastName:  entity.LastName(),
-			Email:     entity.Email(),
-			Password:  entity.Password(),
-			Username:  entity.Username(),
+			Id:        entity.GetId(),
+			FirstName: entity.GetFirstName(),
+			LastName:  entity.GetLastName(),
+			Email:     entity.GetEmail(),
+			Password:  entity.GetPassword(),
+			Username:  entity.GetUsername(),
 		}
 
-		queryResult := userRepository.db.Create(model)
+		queryResult := userRepository.db.Create(&model)
 
-		queryChannel <- DomainCommonDTO.Result[bool]{
+		result <- DomainCommonDTO.Result[bool]{
 			Error:  queryResult.Error,
-			OutPut: queryResult.Error != nil,
+			Result: queryResult.Error != nil,
 		}
 
 	}()
 
-	result <- <-queryChannel
-
 }
 
-func (userRepository *UserRepository) AddRange(entities []*DomainUserEntity.User[string], result chan DomainCommonDTO.Result[bool]) {
-
-	queryChannel := make(chan DomainCommonDTO.Result[bool])
+func (userRepository *UserRepository) AddRange(entities []*DomainUserEntity.User, result chan DomainCommonDTO.Result[bool]) {
 
 	go func() {
 
 		queryResult := userRepository.db.CreateInBatches(entities, len(entities))
 
-		queryChannel <- DomainCommonDTO.Result[bool]{
+		result <- DomainCommonDTO.Result[bool]{
 			Error:  queryResult.Error,
-			OutPut: queryResult.Error != nil,
+			Result: queryResult.Error != nil,
 		}
 
 	}()
 
-	result <- <-queryChannel
-
 }
 
-func (userRepository *UserRepository) Change(entity *DomainUserEntity.User[string], result chan DomainCommonDTO.Result[bool]) {
+func (userRepository *UserRepository) Change(entity *DomainUserEntity.User, result chan DomainCommonDTO.Result[bool]) {
 
 	//todo
 
 }
 
-func (userRepository *UserRepository) Remove(entity *DomainUserEntity.User[string], result chan DomainCommonDTO.Result[bool]) {
+func (userRepository *UserRepository) Remove(entity *DomainUserEntity.User, result chan DomainCommonDTO.Result[bool]) {
 
 	//todo
 
 }
 
-func (userRepository *UserRepository) FindById(id string, result chan DomainCommonDTO.Result[*DomainUserEntity.User[string]]) {
-
-	queryChannel := make(chan DomainCommonDTO.Result[*DomainUserEntity.User[string]])
+func (userRepository *UserRepository) FindById(id string, result chan DomainCommonDTO.Result[*DomainUserEntity.User]) {
 
 	go func() {
 
-		var user *DomainUserEntity.User[string]
+		var user *DomainUserEntity.User
 
 		queryResult := userRepository.db.First(user, "id = ?", id)
 
-		queryChannel <- DomainCommonDTO.Result[*DomainUserEntity.User[string]]{
+		result <- DomainCommonDTO.Result[*DomainUserEntity.User]{
 			Error:  queryResult.Error,
-			OutPut: user,
+			Result: user,
 		}
 
 	}()
 
-	result <- <-queryChannel
+}
+
+func (userRepository *UserRepository) FindAll(paginationRequest *DomainCommonDTO.PaginationRequest, result chan DomainCommonDTO.PaginationResponse[*DomainUserEntity.User]) {
 
 }
 
-func (userRepository *UserRepository) FindAll(paginationRequest *DomainCommonDTO.PaginationRequest, result chan DomainCommonDTO.PaginationResponse[*DomainUserEntity.User[string]]) {
-
-}
-
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func NewUserRepository(Db *gorm.DB) *UserRepository {
+	return &UserRepository{db: Db}
 }

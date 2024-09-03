@@ -10,15 +10,15 @@ import (
 
 type CreateCommandHandler struct {
 	unitOfWork      DomainCommonContract.IUnitOfWork
-	userRepository  DomainUserContract.IUserRepository[string]
-	eventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event[string]]
+	userRepository  DomainUserContract.IUserRepository
+	eventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event]
 }
 
 func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, result chan DomainCommonDTO.Results[bool]) {
 
 	var errors []error
 
-	user, err := DomainUserEntity.NewUser[string](
+	user, err := DomainUserEntity.NewUser(
 		"",
 		command.FirstName,
 		command.LastName,
@@ -32,15 +32,13 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 	if err != nil {
 		result <- DomainCommonDTO.Results[bool]{
 			Errors: append(errors, err),
-			OutPut: false,
+			Result: false,
 		}
-
-		return
 	}
 
-	//user creation
-
 	queryChannel := make(chan DomainCommonDTO.Result[bool])
+
+	//user creation
 
 	go commandHandler.userRepository.Add(user, queryChannel)
 
@@ -52,7 +50,7 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 
 	//event creation
 
-	go commandHandler.eventRepository.AddRange(user.Events(), queryChannel)
+	go commandHandler.eventRepository.AddRange(user.GetEvents(), queryChannel)
 
 	addEventQueryResult := <-queryChannel
 
@@ -71,15 +69,13 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 		if transactionResult.Error != nil {
 			result <- DomainCommonDTO.Results[bool]{
 				Errors: append(errors, transactionResult.Error),
-				OutPut: false,
+				Result: false,
 			}
-
-			return
 		}
 
 		result <- DomainCommonDTO.Results[bool]{
 			Errors: errors,
-			OutPut: false,
+			Result: false,
 		}
 
 	}
@@ -95,23 +91,21 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 	if len(errors) > 0 {
 		result <- DomainCommonDTO.Results[bool]{
 			Errors: errors,
-			OutPut: false,
+			Result: false,
 		}
-
-		return
 	}
 
 	result <- DomainCommonDTO.Results[bool]{
 		Errors: nil,
-		OutPut: true,
+		Result: true,
 	}
 
 }
 
 func NewCreateCommandHandler(
 	UnitOfWork DomainCommonContract.IUnitOfWork,
-	UserRepository DomainUserContract.IUserRepository[string],
-	EventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event[string]],
+	UserRepository DomainUserContract.IUserRepository,
+	EventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event],
 ) *CreateCommandHandler {
 
 	return &CreateCommandHandler{

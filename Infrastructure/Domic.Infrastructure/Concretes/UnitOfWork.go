@@ -16,47 +16,35 @@ func (u *UnitOfWork) Transaction() *gorm.DB {
 
 func (u *UnitOfWork) CommitTransaction(result chan DomainCommonDTO.Result[bool]) {
 
-	commitChannel := make(chan DomainCommonDTO.Result[bool])
-
 	if u.transaction != nil {
 
 		go func() {
 			queryResult := u.transaction.Commit()
 
-			commitChannel <- DomainCommonDTO.Result[bool]{
+			result <- DomainCommonDTO.Result[bool]{
 				Error:  queryResult.Error,
-				OutPut: true,
+				Result: true,
 			}
 		}()
 
 	}
 
-	commitResult := <-commitChannel
-
-	result <- commitResult
-
 }
 
 func (u *UnitOfWork) RollbackTransaction(result chan DomainCommonDTO.Result[bool]) {
-
-	rollBackChannel := make(chan DomainCommonDTO.Result[bool])
 
 	if u.transaction != nil {
 
 		go func() {
 			queryResult := u.transaction.Rollback()
 
-			rollBackChannel <- DomainCommonDTO.Result[bool]{
+			result <- DomainCommonDTO.Result[bool]{
 				Error:  queryResult.Error,
-				OutPut: true,
+				Result: true,
 			}
 		}()
 
 	}
-
-	commitResult := <-rollBackChannel
-
-	result <- commitResult
 
 }
 

@@ -1,11 +1,11 @@
 package DomainCommonDTO
 
-type Result[TOutPut any] struct {
+type Result[TResult any] struct {
 	Error  error
-	OutPut TOutPut
+	Result TResult
 }
 
-type Results[TOutPut any] struct {
+type Results[TResult any] struct {
 	Errors []error
-	OutPut TOutPut
+	Result TResult
 }

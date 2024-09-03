@@ -5,6 +5,6 @@ import (
 	"Domic.Domain/User/Entities"
 )
 
-type IUserRepository[TIdentity any] interface {
-	DomainCommonContract.IRepository[TIdentity, *DomainUserEntity.User[TIdentity]]
+type IUserRepository interface {
+	DomainCommonContract.IRepository[string, *DomainUserEntity.User]
 }

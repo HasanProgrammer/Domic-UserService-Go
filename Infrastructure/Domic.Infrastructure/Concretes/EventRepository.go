@@ -3,7 +3,7 @@ package InfrastructureConcrete
 import (
 	"Domic.Domain/Commons/DTOs"
 	"Domic.Domain/Commons/Entities"
-	InfrastructureModel "Domic.Persistence/Models"
+	"Domic.Persistence/Models"
 	"gorm.io/gorm"
 )
 
@@ -11,28 +11,22 @@ type EventRepository struct {
 	db *gorm.DB
 }
 
-func (eventRepository *EventRepository) Add(entity *DomainCommonEntity.Event[string], result chan DomainCommonDTO.Result[bool]) {
-
-	queryChannel := make(chan DomainCommonDTO.Result[bool])
+func (eventRepository *EventRepository) Add(entity *DomainCommonEntity.Event, result chan DomainCommonDTO.Result[bool]) {
 
 	go func() {
 
 		queryResult := eventRepository.db.Create(entity)
 
-		queryChannel <- DomainCommonDTO.Result[bool]{
+		result <- DomainCommonDTO.Result[bool]{
 			Error:  queryResult.Error,
-			OutPut: queryResult.Error != nil,
+			Result: queryResult.Error != nil,
 		}
 
 	}()
 
-	result <- <-queryChannel
-
 }
 
-func (eventRepository *EventRepository) AddRange(entities []*DomainCommonEntity.Event[string], result chan DomainCommonDTO.Result[bool]) {
-
-	queryChannel := make(chan DomainCommonDTO.Result[bool])
+func (eventRepository *EventRepository) AddRange(entities []*DomainCommonEntity.Event, result chan DomainCommonDTO.Result[bool]) {
 
 	go func() {
 
@@ -53,51 +47,45 @@ func (eventRepository *EventRepository) AddRange(entities []*DomainCommonEntity.
 
 		queryResult := eventRepository.db.CreateInBatches(models, len(entities))
 
-		queryChannel <- DomainCommonDTO.Result[bool]{
+		result <- DomainCommonDTO.Result[bool]{
 			Error:  queryResult.Error,
-			OutPut: queryResult.Error != nil,
+			Result: queryResult.Error != nil,
 		}
 
 	}()
 
-	result <- <-queryChannel
-
 }
 
-func (eventRepository *EventRepository) Change(entity *DomainCommonEntity.Event[string], result chan DomainCommonDTO.Result[bool]) {
+func (eventRepository *EventRepository) Change(entity *DomainCommonEntity.Event, result chan DomainCommonDTO.Result[bool]) {
 
 	//todo
 
 }
 
-func (eventRepository *EventRepository) Remove(entity *DomainCommonEntity.Event[string], result chan DomainCommonDTO.Result[bool]) {
+func (eventRepository *EventRepository) Remove(entity *DomainCommonEntity.Event, result chan DomainCommonDTO.Result[bool]) {
 
 	//todo
 
 }
 
-func (eventRepository *EventRepository) FindById(id string, result chan DomainCommonDTO.Result[*DomainCommonEntity.Event[string]]) {
-
-	queryChannel := make(chan DomainCommonDTO.Result[*DomainCommonEntity.Event[string]])
+func (eventRepository *EventRepository) FindById(id string, result chan DomainCommonDTO.Result[*DomainCommonEntity.Event]) {
 
 	go func() {
 
-		var user *DomainCommonEntity.Event[string]
+		var user *DomainCommonEntity.Event
 
 		queryResult := eventRepository.db.First(user, "id = ?", id)
 
-		queryChannel <- DomainCommonDTO.Result[*DomainCommonEntity.Event[string]]{
+		result <- DomainCommonDTO.Result[*DomainCommonEntity.Event]{
 			Error:  queryResult.Error,
-			OutPut: user,
+			Result: user,
 		}
 
 	}()
 
-	result <- <-queryChannel
-
 }
 
-func (eventRepository *EventRepository) FindAll(paginationRequest *DomainCommonDTO.PaginationRequest, result chan DomainCommonDTO.PaginationResponse[*DomainCommonEntity.Event[string]]) {
+func (eventRepository *EventRepository) FindAll(paginationRequest *DomainCommonDTO.PaginationRequest, result chan DomainCommonDTO.PaginationResponse[*DomainCommonEntity.Event]) {
 
 }
 
