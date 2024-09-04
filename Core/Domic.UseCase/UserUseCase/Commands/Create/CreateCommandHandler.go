@@ -9,6 +9,7 @@ import (
 )
 
 type CreateCommandHandler struct {
+	idGenerator     DomainCommonContract.IGlobalIdentityGenerator
 	unitOfWork      DomainCommonContract.IUnitOfWork
 	userRepository  DomainUserContract.IUserRepository
 	eventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event]
@@ -19,7 +20,7 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 	var errors []error
 
 	user, err := DomainUserEntity.NewUser(
-		"",
+		commandHandler.idGenerator,
 		command.FirstName,
 		command.LastName,
 		command.Username,
@@ -103,12 +104,14 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 }
 
 func NewCreateCommandHandler(
+	IdGenerator DomainCommonContract.IGlobalIdentityGenerator,
 	UnitOfWork DomainCommonContract.IUnitOfWork,
 	UserRepository DomainUserContract.IUserRepository,
 	EventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event],
 ) *CreateCommandHandler {
 
 	return &CreateCommandHandler{
+		idGenerator:     IdGenerator,
 		unitOfWork:      UnitOfWork,
 		userRepository:  UserRepository,
 		eventRepository: EventRepository,

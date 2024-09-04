@@ -16,12 +16,12 @@ func main() {
 
 	userController := WebAPIController.NewUserController(context)
 
-	go e.GET("users", userController.Create)
-	go e.GET("users/{id}", userController.Create)
-	go e.POST("users/create", userController.Create)
-	go e.PATCH("users/update", userController.Create)
-	go e.POST("users/update", userController.Create)
+	//go e.GET("users", userController.Create)
+	//go e.GET("users/{id}", userController.Create)
+	go e.GET("users/create", userController.Create)
+	//go e.PATCH("users/update", userController.Create)
+	//go e.POST("users/update", userController.Create)
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":8080"))
 
 }

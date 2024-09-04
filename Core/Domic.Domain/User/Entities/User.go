@@ -1,29 +1,34 @@
 package DomainUserEntity
 
 import (
+	"Domic.Domain/Commons/Consts"
+	"Domic.Domain/Commons/Contracts"
 	"Domic.Domain/Commons/Entities"
+	"encoding/json"
 	"errors"
 	"time"
 )
 
 type User struct {
-	events    []*DomainCommonEntity.Event
-	id        string
-	firstName string
-	lastName  string
-	username  string
-	password  string
-	email     string
-	isActive  bool
+	events []*DomainCommonEntity.Event
+
+	id        string `json:"id"`
+	firstName string `json:"firstName"`
+	lastName  string `json:"lastName"`
+	username  string `json:"username"`
+	password  string `json:"password"`
+	email     string `json:"email"`
+	isActive  bool   `json:"isActive"`
+	version   string
 
 	//audit fields
 
-	createdAt   time.Time
-	createdBy   string
-	createdRole string
-	updatedAt   *time.Time
-	updatedBy   string
-	updatedRole *string
+	createdAt   time.Time  `json:"createdAt"`
+	createdBy   string     `json:"createdBy"`
+	createdRole string     `json:"createdRole"`
+	updatedAt   *time.Time `json:"updatedAt"`
+	updatedBy   string     `json:"updatedBy"`
+	updatedRole *string    `json:"updatedRole"`
 }
 
 func (u *User) GetEvents() []*DomainCommonEntity.Event {
@@ -82,25 +87,59 @@ func (u *User) GetUpdatedRole() *string {
 	return u.updatedRole
 }
 
-func NewUser(id string, firstName string, lastName string, username string, password string, email string, createdBy string, createdRole string) (*User, error) {
+func (u *User) Active(idGenerator DomainCommonContract.IGlobalIdentityGenerator, updatedBy string, updatedRole string) error {
+
+	nowTime := time.Now()
+
+	u.isActive = false
+	u.updatedAt = &nowTime
+	u.updatedBy = updatedBy
+	u.updatedRole = &updatedRole
+
+	eventPayload, err := json.Marshal(u)
+
+	if err != nil {
+		return err
+	}
+
+	u.events = append(u.events,
+		DomainCommonEntity.NewEvent(
+			idGenerator.Generate(),
+			"UserActived",
+			"User",
+			DomainCommonConst.UPDATE,
+			string(eventPayload),
+			nowTime,
+			updatedBy,
+			updatedRole,
+		),
+	)
+
+	return nil
+}
+
+func NewUser(idGenerator DomainCommonContract.IGlobalIdentityGenerator, firstName string, lastName string,
+	username string, password string, email string, createdBy string, createdRole string,
+) (*User, error) {
 
 	if len(firstName) >= 100 {
-		return nil, errors.New("")
+		return nil, errors.New("فیلد نام باید کمتر از 100 عبارت داشته باشد")
 	}
 
 	if len(lastName) >= 200 {
-		return nil, errors.New("")
+		return nil, errors.New("فیلد نام خانوادگی باید کمتر از 200 عبارت داشته باشد")
 	}
 
 	nowTime := time.Now()
 
 	user := &User{
-		id:          id,
+		id:          idGenerator.Generate(),
 		firstName:   firstName,
 		lastName:    lastName,
 		username:    username,
 		password:    password,
 		email:       email,
+		version:     idGenerator.Generate(),
 		createdAt:   nowTime,
 		createdBy:   createdBy,
 		createdRole: createdRole,
@@ -108,8 +147,23 @@ func NewUser(id string, firstName string, lastName string, username string, pass
 
 	//producing event
 
+	eventPayload, err := json.Marshal(user)
+
+	if err != nil {
+		return nil, err
+	}
+
 	user.events = append(user.events,
-		DomainCommonEntity.NewEvent("", "UserCreated", "User", "Create", "", nowTime, createdBy, createdRole),
+		DomainCommonEntity.NewEvent(
+			idGenerator.Generate(),
+			"UserCreated",
+			"User",
+			DomainCommonConst.CREATE,
+			string(eventPayload),
+			nowTime,
+			createdBy,
+			createdRole,
+		),
 	)
 
 	return user, nil

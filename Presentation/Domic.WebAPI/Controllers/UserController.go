@@ -28,6 +28,7 @@ func (userController *UserController) Create(context echo.Context) error {
 	unitOfWork := InfrastructureConcrete.NewUnitOfWork(userController.db)
 
 	createUserCommand := UseCaseUserCommand.NewCreateCommandHandler(
+		InfrastructureConcrete.NewGlobalIdentityGenerator(),
 		unitOfWork,
 		InfrastructureConcrete.NewUserRepository(unitOfWork.GetTransaction()),
 		InfrastructureConcrete.NewEventRepository(unitOfWork.GetTransaction()),
