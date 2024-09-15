@@ -15,7 +15,7 @@ type CreateCommandHandler struct {
 	eventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event]
 }
 
-func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, result chan DomainCommonDTO.Results[bool]) {
+func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand) DomainCommonDTO.Results[bool] {
 
 	var errors []error
 
@@ -31,7 +31,7 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 	)
 
 	if err != nil {
-		result <- DomainCommonDTO.Results[bool]{
+		return DomainCommonDTO.Results[bool]{
 			Errors: append(errors, err),
 			Result: false,
 		}
@@ -68,13 +68,13 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 		transactionResult := <-queryChannel
 
 		if transactionResult.Error != nil {
-			result <- DomainCommonDTO.Results[bool]{
+			return DomainCommonDTO.Results[bool]{
 				Errors: append(errors, transactionResult.Error),
 				Result: false,
 			}
 		}
 
-		result <- DomainCommonDTO.Results[bool]{
+		return DomainCommonDTO.Results[bool]{
 			Errors: errors,
 			Result: false,
 		}
@@ -90,13 +90,13 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand, resul
 	}
 
 	if len(errors) > 0 {
-		result <- DomainCommonDTO.Results[bool]{
+		return DomainCommonDTO.Results[bool]{
 			Errors: errors,
 			Result: false,
 		}
 	}
 
-	result <- DomainCommonDTO.Results[bool]{
+	return DomainCommonDTO.Results[bool]{
 		Errors: nil,
 		Result: true,
 	}

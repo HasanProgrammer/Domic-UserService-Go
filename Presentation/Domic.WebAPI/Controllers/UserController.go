@@ -1,7 +1,6 @@
 package WebAPIController
 
 import (
-	"Domic.Domain/Commons/DTOs"
 	"Domic.Infrastructure/Concretes"
 	"Domic.UseCase/UserUseCase/Commands/Create"
 	"github.com/labstack/echo/v4"
@@ -14,8 +13,6 @@ type UserController struct {
 }
 
 func (userController *UserController) Create(context echo.Context) error {
-
-	commandChannel := make(chan DomainCommonDTO.Results[bool])
 
 	createCommand := UseCaseUserCommand.CreateCommand{
 		FirstName: "حسن",
@@ -34,9 +31,7 @@ func (userController *UserController) Create(context echo.Context) error {
 		InfrastructureConcrete.NewEventRepository(unitOfWork.GetTransaction()),
 	)
 
-	go createUserCommand.Handle(&createCommand, commandChannel)
-
-	commandResult := <-commandChannel
+	commandResult := createUserCommand.Handle(&createCommand)
 
 	if !commandResult.Result {
 		return context.String(http.StatusOK, "Error")

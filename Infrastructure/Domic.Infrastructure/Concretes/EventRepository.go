@@ -13,16 +13,12 @@ type EventRepository struct {
 
 func (eventRepository *EventRepository) Add(entity *DomainCommonEntity.Event, result chan DomainCommonDTO.Result[bool]) {
 
-	go func() {
+	queryResult := eventRepository.db.Create(entity)
 
-		queryResult := eventRepository.db.Create(entity)
-
-		result <- DomainCommonDTO.Result[bool]{
-			Error:  queryResult.Error,
-			Result: queryResult.Error != nil,
-		}
-
-	}()
+	result <- DomainCommonDTO.Result[bool]{
+		Error:  queryResult.Error,
+		Result: queryResult.Error != nil,
+	}
 
 }
 
