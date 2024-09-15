@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Domic.Persistence"
 	"Domic.WebAPI/Controllers"
+	"Domic.WebAPI/Middlewares"
 	"github.com/labstack/echo/v4"
 )
 
@@ -10,13 +10,27 @@ func main() {
 
 	e := echo.New()
 
-	context := Persistence.NewSqlContext("sqlserver://sa:Domic123@127.0.0.1:1633?database=UserService").GetContext()
-
 	//users
 
-	userController := WebAPIController.NewUserController(context)
+	userApiGroup := e.Group("/users")
 
-	go e.POST("users", userController.Create)
+	userApiGroup.Use(WebAPIMiddleware.Auth)
+
+	go userApiGroup.POST("users", func(c echo.Context) error {
+
+		userController := WebAPIController.NewUserController()
+
+		return userController.Create(c)
+
+	})
+
+	go userApiGroup.PATCH("users/signin", func(c echo.Context) error {
+
+		userController := WebAPIController.NewUserController()
+
+		return userController.SignIn(c)
+
+	})
 
 	e.Logger.Fatal(e.Start(":8080"))
 

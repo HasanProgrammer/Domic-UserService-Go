@@ -24,31 +24,27 @@ func (eventRepository *EventRepository) Add(entity *DomainCommonEntity.Event, re
 
 func (eventRepository *EventRepository) AddRange(entities []*DomainCommonEntity.Event, result chan DomainCommonDTO.Result[bool]) {
 
-	go func() {
+	var models []*InfrastructureModel.EventModel
 
-		var models []*InfrastructureModel.EventModel
+	for _, entity := range entities {
+		models = append(models, &InfrastructureModel.EventModel{
+			Id:          entity.GetId(),
+			Name:        entity.GetName(),
+			Table:       entity.GetTable(),
+			Action:      entity.GetAction(),
+			Payload:     entity.GetPayload(),
+			CreatedAt:   entity.GetCreatedAt(),
+			CreatedBy:   entity.GetCreatedBy(),
+			CreatedRole: entity.GetCreatedRole(),
+		})
+	}
 
-		for _, entity := range entities {
-			models = append(models, &InfrastructureModel.EventModel{
-				Id:          entity.GetId(),
-				Name:        entity.GetName(),
-				Table:       entity.GetTable(),
-				Action:      entity.GetAction(),
-				Payload:     entity.GetPayload(),
-				CreatedAt:   entity.GetCreatedAt(),
-				CreatedBy:   entity.GetCreatedBy(),
-				CreatedRole: entity.GetCreatedRole(),
-			})
-		}
+	queryResult := eventRepository.db.CreateInBatches(models, len(entities))
 
-		queryResult := eventRepository.db.CreateInBatches(models, len(entities))
-
-		result <- DomainCommonDTO.Result[bool]{
-			Error:  queryResult.Error,
-			Result: queryResult.Error != nil,
-		}
-
-	}()
+	result <- DomainCommonDTO.Result[bool]{
+		Error:  queryResult.Error,
+		Result: queryResult.Error != nil,
+	}
 
 }
 
@@ -66,18 +62,14 @@ func (eventRepository *EventRepository) Remove(entity *DomainCommonEntity.Event,
 
 func (eventRepository *EventRepository) FindById(id string, result chan DomainCommonDTO.Result[*DomainCommonEntity.Event]) {
 
-	go func() {
+	var user *DomainCommonEntity.Event
 
-		var user *DomainCommonEntity.Event
+	queryResult := eventRepository.db.First(user, "id = ?", id)
 
-		queryResult := eventRepository.db.First(user, "id = ?", id)
-
-		result <- DomainCommonDTO.Result[*DomainCommonEntity.Event]{
-			Error:  queryResult.Error,
-			Result: user,
-		}
-
-	}()
+	result <- DomainCommonDTO.Result[*DomainCommonEntity.Event]{
+		Error:  queryResult.Error,
+		Result: user,
+	}
 
 }
 

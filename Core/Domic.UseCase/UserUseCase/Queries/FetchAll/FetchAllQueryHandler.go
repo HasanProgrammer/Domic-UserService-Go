@@ -10,7 +10,7 @@ type FetchAllQueryHandler struct {
 	userRepository DomainUserContract.IUserRepository
 }
 
-func (handler *FetchAllQueryHandler) Handle(query *FetchAllQuery, result chan DomainCommonDTO.Results[DomainCommonDTO.PaginationResponse[*DomainUserEntity.User]]) {
+func (handler *FetchAllQueryHandler) Handle(query *FetchAllQuery) DomainCommonDTO.Results[DomainCommonDTO.PaginationResponse[*DomainUserEntity.User]] {
 
 	queryChannel := make(chan DomainCommonDTO.PaginationResponse[*DomainUserEntity.User])
 
@@ -18,7 +18,7 @@ func (handler *FetchAllQueryHandler) Handle(query *FetchAllQuery, result chan Do
 
 	resultQuery := <-queryChannel
 
-	result <- DomainCommonDTO.Results[DomainCommonDTO.PaginationResponse[*DomainUserEntity.User]]{
+	return DomainCommonDTO.Results[DomainCommonDTO.PaginationResponse[*DomainUserEntity.User]]{
 		Result: resultQuery,
 		Errors: []error{},
 	}

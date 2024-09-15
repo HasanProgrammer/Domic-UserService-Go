@@ -6,7 +6,7 @@ import (
 )
 
 type UnitOfWork struct {
-	db    		*gorm.DB
+	db          *gorm.DB
 	transaction *gorm.DB
 }
 
@@ -18,14 +18,12 @@ func (u *UnitOfWork) Commit(result chan DomainCommonDTO.Result[bool]) {
 
 	if u.transaction != nil {
 
-		go func() {
-			queryResult := u.transaction.Commit()
+		queryResult := u.transaction.Commit()
 
-			result <- DomainCommonDTO.Result[bool]{
-				Error:  queryResult.Error,
-				Result: true,
-			}
-		}()
+		result <- DomainCommonDTO.Result[bool]{
+			Error:  queryResult.Error,
+			Result: true,
+		}
 
 	}
 
@@ -35,14 +33,12 @@ func (u *UnitOfWork) Rollback(result chan DomainCommonDTO.Result[bool]) {
 
 	if u.transaction != nil {
 
-		go func() {
-			queryResult := u.transaction.Rollback()
+		queryResult := u.transaction.Rollback()
 
-			result <- DomainCommonDTO.Result[bool]{
-				Error:  queryResult.Error,
-				Result: true,
-			}
-		}()
+		result <- DomainCommonDTO.Result[bool]{
+			Error:  queryResult.Error,
+			Result: true,
+		}
 
 	}
 

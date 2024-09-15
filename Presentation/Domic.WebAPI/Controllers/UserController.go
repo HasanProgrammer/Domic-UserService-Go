@@ -2,7 +2,9 @@ package WebAPIController
 
 import (
 	"Domic.Infrastructure/Concretes"
-	"Domic.UseCase/UserUseCase/Commands/Create"
+	"Domic.Persistence"
+	UserCreate "Domic.UseCase/UserUseCase/Commands/Create"
+	UserSignIn "Domic.UseCase/UserUseCase/Commands/SignIn"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 	"net/http"
@@ -14,7 +16,7 @@ type UserController struct {
 
 func (userController *UserController) Create(context echo.Context) error {
 
-	createCommand := UseCaseUserCommand.CreateCommand{
+	createCommand := UserCreate.CreateCommand{
 		FirstName: "حسن",
 		LastName:  "کرمی محب",
 		Username:  "hasan_karami_moheb",
@@ -24,7 +26,7 @@ func (userController *UserController) Create(context echo.Context) error {
 
 	unitOfWork := InfrastructureConcrete.NewUnitOfWork(userController.db)
 
-	createUserCommand := UseCaseUserCommand.NewCreateCommandHandler(
+	createUserCommand := UserCreate.NewCreateCommandHandler(
 		InfrastructureConcrete.NewGlobalIdentityGenerator(),
 		unitOfWork,
 		InfrastructureConcrete.NewUserRepository(unitOfWork.GetTransaction()),
@@ -33,14 +35,46 @@ func (userController *UserController) Create(context echo.Context) error {
 
 	commandResult := createUserCommand.Handle(&createCommand)
 
-	if !commandResult.Result {
-		return context.String(http.StatusOK, "Error")
+	if len(commandResult.Errors) > 0 {
+
+		result, err := InfrastructureConcrete.NewSerializer().Serialize(commandResult.Errors)
+
+		if err != nil {
+		}
+
+		return context.String(http.StatusOK, result)
+
 	}
 
-	return context.String(http.StatusOK, "Successfully Created!")
+	return context.String(http.StatusOK, "Successfully Operation")
 
 }
 
-func NewUserController(db *gorm.DB) *UserController {
-	return &UserController{db: db}
+func (userController *UserController) SignIn(context echo.Context) error {
+
+	signInCommand := UserSignIn.SignInCommand{
+		Username: "",
+		Password: "",
+	}
+
+	commandResult := UserSignIn.NewSignInCommandHandler(InfrastructureConcrete.NewJsonWebToken()).Handle(&signInCommand)
+
+	if len(commandResult.Errors) > 0 {
+
+		result, err := InfrastructureConcrete.NewSerializer().Serialize(commandResult.Errors)
+
+		if err != nil {
+		}
+
+		return context.String(http.StatusOK, result)
+	}
+
+	return context.String(http.StatusOK, "Successfully Operation")
+
+}
+
+func NewUserController() *UserController {
+	return &UserController{
+		db: Persistence.NewSqlContext("sqlserver://sa:Domic123@127.0.0.1:1633?database=UserService").GetContext(),
+	}
 }
