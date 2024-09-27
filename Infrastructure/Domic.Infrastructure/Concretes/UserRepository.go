@@ -26,7 +26,7 @@ func (userRepository *UserRepository) Add(entity *DomainUserEntity.User, result 
 
 	result <- DomainCommonDTO.Result[bool]{
 		Error:  queryResult.Error,
-		Result: queryResult.Error != nil,
+		Result: queryResult.Error == nil,
 	}
 
 }

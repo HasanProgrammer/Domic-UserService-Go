@@ -28,10 +28,10 @@ type UserController struct {
 // @Accept       json
 // @Produce      json
 // @param        request body CreateRequest true "command"
-// @Success      200  {object}  error
-// @Failure      400  {object}  error
-// @Failure      404  {object}  error
-// @Failure      500  {object}  error
+// @Success      200  {string}  error
+// @Failure      400  {string}  error
+// @Failure      404  {string}  error
+// @Failure      500  {string}  error
 // @Router       /api/v1/users [post]
 func (controller *UserController) Create(c echo.Context) error {
 
