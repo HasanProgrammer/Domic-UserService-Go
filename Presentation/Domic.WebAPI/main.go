@@ -2,7 +2,6 @@ package main
 
 import (
 	"Domic.WebAPI/Controllers"
-	"Domic.WebAPI/Middlewares"
 	_ "Domic.WebAPI/docs"
 	"github.com/labstack/echo/v4"
 	"github.com/swaggo/echo-swagger"
@@ -26,7 +25,7 @@ func main() {
 
 	userController := WebAPIController.NewUserController()
 
-	apiGroup := e.Group("/api/v1/", WebAPIMiddleware.Auth)
+	apiGroup := e.Group("/api/v1/" /*, WebAPIMiddleware.Auth*/)
 
 	userApiGroup := apiGroup.Group("users")
 

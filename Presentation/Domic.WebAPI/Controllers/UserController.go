@@ -9,6 +9,14 @@ import (
 	"net/http"
 )
 
+type CreateRequest struct {
+	Username  string `json:"Username"`
+	Password  string `json:"Password"`
+	FirstName string `json:"FirstName"`
+	LastName  string `json:"LastName"`
+	Email     string `json:"Email"`
+}
+
 type UserController struct {
 	connectionString string
 }
@@ -19,11 +27,7 @@ type UserController struct {
 // @Tags         Users
 // @Accept       json
 // @Produce      json
-// @param        FirstName body  string  true "firstName"
-// @param        LastName  body  string  true "lastName"
-// @param        Username  body  string  true "username"
-// @param        Password  body  string  true "password"
-// @param        Email     body  string  true "email"
+// @param        request body CreateRequest true "command"
 // @Success      200  {object}  error
 // @Failure      400  {object}  error
 // @Failure      404  {object}  error
@@ -31,15 +35,19 @@ type UserController struct {
 // @Router       /api/v1/users [post]
 func (controller *UserController) Create(c echo.Context) error {
 
-	createCommand := UserCreate.CreateCommand{
-		FirstName: c.FormValue("FirstName"),
-		LastName:  c.FormValue("LastName"),
-		Username:  c.FormValue("Username"),
-		Password:  c.FormValue("Password"),
-		Email:     c.FormValue("Email"),
+	var request *CreateRequest
+
+	c.Bind(&request)
+
+	command := UserCreate.CreateCommand{
+		Email:     request.Email,
+		Username:  request.Username,
+		Password:  request.Password,
+		FirstName: request.FirstName,
+		LastName:  request.LastName,
 	}
 
-	db := Persistence.NewSqlContext("").GetContext()
+	db := Persistence.NewSqlContext(controller.connectionString).GetContext()
 
 	unitOfWork := InfrastructureConcrete.NewUnitOfWork(db)
 
@@ -50,7 +58,7 @@ func (controller *UserController) Create(c echo.Context) error {
 		InfrastructureConcrete.NewEventRepository(unitOfWork.GetTransaction()),
 	)
 
-	commandResult := createUserCommand.Handle(&createCommand)
+	commandResult := createUserCommand.Handle(&command)
 
 	if len(commandResult.Errors) > 0 {
 
@@ -69,8 +77,6 @@ func (controller *UserController) Create(c echo.Context) error {
 
 func (controller *UserController) Update(c echo.Context) error {
 
-	db := Persistence.NewSqlContext(controller.connectionString).GetContext()
-
 	createCommand := UserCreate.CreateCommand{
 		FirstName: "حسن",
 		LastName:  "کرمی محب",
@@ -78,6 +84,8 @@ func (controller *UserController) Update(c echo.Context) error {
 		Password:  "123456",
 		Email:     "hasan_karami_moheb@gmail.com",
 	}
+
+	db := Persistence.NewSqlContext(controller.connectionString).GetContext()
 
 	unitOfWork := InfrastructureConcrete.NewUnitOfWork(db)
 

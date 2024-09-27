@@ -1,3 +1,17 @@
+definitions:
+  WebAPIController.CreateRequest:
+    properties:
+      Email:
+        type: string
+      FirstName:
+        type: string
+      LastName:
+        type: string
+      Password:
+        type: string
+      Username:
+        type: string
+    type: object
 info:
   contact: {}
   title: Swagger UserService API
@@ -7,36 +21,12 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: firstName
+      - description: command
         in: body
-        name: FirstName
+        name: request
         required: true
         schema:
-          type: string
-      - description: lastName
-        in: body
-        name: LastName
-        required: true
-        schema:
-          type: string
-      - description: username
-        in: body
-        name: Username
-        required: true
-        schema:
-          type: string
-      - description: password
-        in: body
-        name: Password
-        required: true
-        schema:
-          type: string
-      - description: email
-        in: body
-        name: Email
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/WebAPIController.CreateRequest'
       produces:
       - application/json
       responses:
@@ -53,7 +43,7 @@ paths:
           description: Internal Server Error
           schema: {}
       tags:
-      - users
+      - Users
 securityDefinitions:
   ApiKeyAuth:
     in: header
