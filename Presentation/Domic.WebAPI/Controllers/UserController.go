@@ -6,25 +6,26 @@ import (
 	UserCreate "Domic.UseCase/UserUseCase/Commands/Create"
 	UserSignIn "Domic.UseCase/UserUseCase/Commands/SignIn"
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 	"net/http"
 )
 
 type UserController struct {
-	db *gorm.DB
+	connectionString string
 }
 
-func (userController *UserController) Create(context echo.Context) error {
+func (controller *UserController) Create(c echo.Context) error {
 
 	createCommand := UserCreate.CreateCommand{
-		FirstName: "حسن",
-		LastName:  "کرمی محب",
-		Username:  "hasan_karami_moheb",
-		Password:  "123456",
-		Email:     "hasan_karami_moheb@gmail.com",
+		FirstName: c.FormValue("FirstName"),
+		LastName:  c.FormValue("LastName"),
+		Username:  c.FormValue("Username"),
+		Password:  c.FormValue("Password"),
+		Email:     c.FormValue("Email"),
 	}
 
-	unitOfWork := InfrastructureConcrete.NewUnitOfWork(userController.db)
+	db := Persistence.NewSqlContext("").GetContext()
+
+	unitOfWork := InfrastructureConcrete.NewUnitOfWork(db)
 
 	createUserCommand := UserCreate.NewCreateCommandHandler(
 		InfrastructureConcrete.NewGlobalIdentityGenerator(),
@@ -42,19 +43,59 @@ func (userController *UserController) Create(context echo.Context) error {
 		if err != nil {
 		}
 
-		return context.String(http.StatusOK, result)
+		return c.String(http.StatusOK, result)
 
 	}
 
-	return context.String(http.StatusOK, "Successfully Operation")
+	return c.String(http.StatusOK, "Successfully Operation")
 
 }
 
-func (userController *UserController) SignIn(context echo.Context) error {
+func (controller *UserController) Update(c echo.Context) error {
+
+	db := Persistence.NewSqlContext(controller.connectionString).GetContext()
+
+	createCommand := UserCreate.CreateCommand{
+		FirstName: "حسن",
+		LastName:  "کرمی محب",
+		Username:  "hasan_karami_moheb",
+		Password:  "123456",
+		Email:     "hasan_karami_moheb@gmail.com",
+	}
+
+	unitOfWork := InfrastructureConcrete.NewUnitOfWork(db)
+
+	createUserCommand := UserCreate.NewCreateCommandHandler(
+		InfrastructureConcrete.NewGlobalIdentityGenerator(),
+		unitOfWork,
+		InfrastructureConcrete.NewUserRepository(unitOfWork.GetTransaction()),
+		InfrastructureConcrete.NewEventRepository(unitOfWork.GetTransaction()),
+	)
+
+	commandResult := createUserCommand.Handle(&createCommand)
+
+	if len(commandResult.Errors) > 0 {
+
+		result, err := InfrastructureConcrete.NewSerializer().Serialize(commandResult.Errors)
+
+		if err != nil {
+		}
+
+		return c.String(http.StatusOK, result)
+
+	}
+
+	return c.String(http.StatusOK, "Successfully Operation")
+
+}
+
+func (controller *UserController) SignIn(c echo.Context) error {
+
+	//db := Persistence.NewSqlContext(controller.connectionString).GetContext()
 
 	signInCommand := UserSignIn.SignInCommand{
-		Username: "",
-		Password: "",
+		Username: c.FormValue("Username"),
+		Password: c.FormValue("Password"),
 	}
 
 	commandResult := UserSignIn.NewSignInCommandHandler(InfrastructureConcrete.NewJsonWebToken()).Handle(&signInCommand)
@@ -66,15 +107,23 @@ func (userController *UserController) SignIn(context echo.Context) error {
 		if err != nil {
 		}
 
-		return context.String(http.StatusOK, result)
+		return c.String(http.StatusOK, result)
 	}
 
-	return context.String(http.StatusOK, "Successfully Operation")
+	return c.String(http.StatusOK, "Successfully Operation")
 
 }
 
 func NewUserController() *UserController {
-	return &UserController{
-		db: Persistence.NewSqlContext("sqlserver://sa:Domic123@127.0.0.1:1633?database=UserService").GetContext(),
+
+	connectionString, err := InfrastructureConcrete.NewConfiguration().GetConnectionString("SqlServer")
+
+	if err != nil {
+
 	}
+
+	return &UserController{
+		connectionString: connectionString,
+	}
+
 }

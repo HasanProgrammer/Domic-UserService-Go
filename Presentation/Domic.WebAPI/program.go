@@ -10,27 +10,25 @@ func main() {
 
 	e := echo.New()
 
-	//users
+	//GlobalMiddlewares
 
-	userApiGroup := e.Group("/users")
+	e.Use(WebAPIMiddleware.Auth)
 
-	userApiGroup.Use(WebAPIMiddleware.Auth)
+	//GlobalMiddlewares
 
-	go userApiGroup.POST("users", func(c echo.Context) error {
+	/*---------------------------------------------------------------*/
 
-		userController := WebAPIController.NewUserController()
+	//UserController
 
-		return userController.Create(c)
+	userController := WebAPIController.NewUserController()
 
-	})
+	userApiGroup := e.Group("api/v1/users")
 
-	go userApiGroup.PATCH("users/signin", func(c echo.Context) error {
+	userApiGroup.POST("", userController.Create)
+	userApiGroup.PATCH("", userController.Update)
+	userApiGroup.PATCH("signin", userController.SignIn)
 
-		userController := WebAPIController.NewUserController()
-
-		return userController.SignIn(c)
-
-	})
+	//UserController
 
 	e.Logger.Fatal(e.Start(":8080"))
 
