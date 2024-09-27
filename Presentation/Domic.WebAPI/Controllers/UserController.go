@@ -13,6 +13,22 @@ type UserController struct {
 	connectionString string
 }
 
+// Create godoc
+// @Summary
+// @Description
+// @Tags         Users
+// @Accept       json
+// @Produce      json
+// @param        FirstName body  string  true "firstName"
+// @param        LastName  body  string  true "lastName"
+// @param        Username  body  string  true "username"
+// @param        Password  body  string  true "password"
+// @param        Email     body  string  true "email"
+// @Success      200  {object}  error
+// @Failure      400  {object}  error
+// @Failure      404  {object}  error
+// @Failure      500  {object}  error
+// @Router       /api/v1/users [post]
 func (controller *UserController) Create(c echo.Context) error {
 
 	createCommand := UserCreate.CreateCommand{

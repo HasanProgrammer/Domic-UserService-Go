@@ -1,0 +1,62 @@
+info:
+  contact: {}
+  title: Swagger UserService API
+paths:
+  /api/v1/users:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: firstName
+        in: body
+        name: FirstName
+        required: true
+        schema:
+          type: string
+      - description: lastName
+        in: body
+        name: LastName
+        required: true
+        schema:
+          type: string
+      - description: username
+        in: body
+        name: Username
+        required: true
+        schema:
+          type: string
+      - description: password
+        in: body
+        name: Password
+        required: true
+        schema:
+          type: string
+      - description: email
+        in: body
+        name: Email
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema: {}
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      tags:
+      - users
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: '"Authorization"'
+    type: apiKey
+swagger: "2.0"
