@@ -1,5 +1,5 @@
 {
   "ConnectionStrings": {
-    "SqlServer": "sqlserver://sa:Domic123@127.0.0.1:1433?database=UserService"
+    "SqlServer": "sqlserver://sa:Domic123@127.0.0.1:1433?database=UserService&encrypt=disable"
   }
 }

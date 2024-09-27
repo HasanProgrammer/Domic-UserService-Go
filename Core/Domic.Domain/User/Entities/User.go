@@ -12,23 +12,23 @@ import (
 type User struct {
 	events []*DomainCommonEntity.Event
 
-	id        string `json:"id"`
-	firstName string `json:"firstName"`
-	lastName  string `json:"lastName"`
-	username  string `json:"username"`
-	password  string `json:"password"`
-	email     string `json:"email"`
-	isActive  bool   `json:"isActive"`
+	id        string
+	firstName string
+	lastName  string
+	username  string
+	password  string
+	email     string
+	isActive  bool
 	version   string
 
 	//audit fields
 
-	createdAt   time.Time  `json:"createdAt"`
-	createdBy   string     `json:"createdBy"`
-	createdRole string     `json:"createdRole"`
-	updatedAt   *time.Time `json:"updatedAt"`
-	updatedBy   string     `json:"updatedBy"`
-	updatedRole *string    `json:"updatedRole"`
+	createdAt   time.Time
+	createdBy   string
+	createdRole string
+	updatedAt   *time.Time
+	updatedBy   string
+	updatedRole *string
 }
 
 func (u *User) GetEvents() []*DomainCommonEntity.Event {
@@ -118,7 +118,7 @@ func (u *User) Active(idGenerator DomainCommonContract.IGlobalIdentityGenerator,
 	return nil
 }
 
-func NewUser(idGenerator DomainCommonContract.IGlobalIdentityGenerator, firstName string, lastName string,
+func NewUser(idGenerator DomainCommonContract.IGlobalIdentityGenerator, serializer DomainCommonContract.ISerializer, firstName string, lastName string,
 	username string, password string, email string, createdBy string, createdRole string,
 ) (*User, error) {
 
@@ -147,7 +147,35 @@ func NewUser(idGenerator DomainCommonContract.IGlobalIdentityGenerator, firstNam
 
 	//producing event
 
-	eventPayload, err := json.Marshal(user)
+	eventPayload, err := serializer.Serialize(struct {
+		Id          string     `json:"id"`
+		FirstName   string     `json:"firstName"`
+		LastName    string     `json:"lastName"`
+		Username    string     `json:"username"`
+		Password    string     `json:"password"`
+		Email       string     `json:"email"`
+		IsActive    bool       `json:"isActive"`
+		CreatedAt   time.Time  `json:"createdAt"`
+		CreatedBy   string     `json:"createdBy"`
+		CreatedRole string     `json:"createdRole"`
+		UpdatedAt   *time.Time `json:"updatedAt"`
+		UpdatedBy   string     `json:"updatedBy"`
+		UpdatedRole *string    `json:"updatedRole"`
+	}{
+		Id:          user.id,
+		FirstName:   user.firstName,
+		LastName:    user.lastName,
+		Username:    user.username,
+		Password:    user.password,
+		Email:       user.email,
+		IsActive:    user.isActive,
+		CreatedAt:   user.createdAt,
+		CreatedBy:   user.createdBy,
+		CreatedRole: user.createdRole,
+		UpdatedAt:   user.updatedAt,
+		UpdatedBy:   user.updatedBy,
+		UpdatedRole: user.updatedRole,
+	})
 
 	if err != nil {
 		return nil, err
@@ -159,7 +187,7 @@ func NewUser(idGenerator DomainCommonContract.IGlobalIdentityGenerator, firstNam
 			"UserCreated",
 			"User",
 			DomainCommonConst.CREATE,
-			string(eventPayload),
+			eventPayload,
 			nowTime,
 			createdBy,
 			createdRole,

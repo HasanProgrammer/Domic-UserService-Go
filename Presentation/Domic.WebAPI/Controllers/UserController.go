@@ -53,6 +53,7 @@ func (controller *UserController) Create(c echo.Context) error {
 
 	createUserCommand := UserCreate.NewCreateCommandHandler(
 		InfrastructureConcrete.NewGlobalIdentityGenerator(),
+		InfrastructureConcrete.NewSerializer(),
 		unitOfWork,
 		InfrastructureConcrete.NewUserRepository(unitOfWork.GetTransaction()),
 		InfrastructureConcrete.NewEventRepository(unitOfWork.GetTransaction()),
@@ -91,6 +92,7 @@ func (controller *UserController) Update(c echo.Context) error {
 
 	createUserCommand := UserCreate.NewCreateCommandHandler(
 		InfrastructureConcrete.NewGlobalIdentityGenerator(),
+		InfrastructureConcrete.NewSerializer(),
 		unitOfWork,
 		InfrastructureConcrete.NewUserRepository(unitOfWork.GetTransaction()),
 		InfrastructureConcrete.NewEventRepository(unitOfWork.GetTransaction()),

@@ -17,11 +17,11 @@ func (sqlContext *SqlContext) GetContext() *gorm.DB {
 func NewSqlContext(connectionString string) *SqlContext {
 	db, err := gorm.Open(sqlserver.Open(connectionString), &gorm.Config{})
 
-	db.AutoMigrate(&InfrastructureModel.EventModel{})
-	db.AutoMigrate(&InfrastructureModel.UserModel{})
-
 	if err != nil {
 	}
+
+	db.AutoMigrate(&InfrastructureModel.EventModel{})
+	db.AutoMigrate(&InfrastructureModel.UserModel{})
 
 	return &SqlContext{db: db}
 }

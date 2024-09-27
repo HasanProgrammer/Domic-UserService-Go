@@ -9,6 +9,7 @@ import (
 )
 
 type CreateCommandHandler struct {
+	serializer      DomainCommonContract.ISerializer
 	idGenerator     DomainCommonContract.IGlobalIdentityGenerator
 	unitOfWork      DomainCommonContract.IUnitOfWork
 	userRepository  DomainUserContract.IUserRepository
@@ -21,6 +22,7 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand) Domai
 
 	user, err := DomainUserEntity.NewUser(
 		commandHandler.idGenerator,
+		commandHandler.serializer,
 		command.FirstName,
 		command.LastName,
 		command.Username,
@@ -105,6 +107,7 @@ func (commandHandler *CreateCommandHandler) Handle(command *CreateCommand) Domai
 
 func NewCreateCommandHandler(
 	IdGenerator DomainCommonContract.IGlobalIdentityGenerator,
+	Serializer DomainCommonContract.ISerializer,
 	UnitOfWork DomainCommonContract.IUnitOfWork,
 	UserRepository DomainUserContract.IUserRepository,
 	EventRepository DomainCommonContract.IRepository[string, *DomainCommonEntity.Event],
@@ -112,6 +115,7 @@ func NewCreateCommandHandler(
 
 	return &CreateCommandHandler{
 		idGenerator:     IdGenerator,
+		serializer:      Serializer,
 		unitOfWork:      UnitOfWork,
 		userRepository:  UserRepository,
 		eventRepository: EventRepository,

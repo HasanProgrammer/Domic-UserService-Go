@@ -1,13 +1,13 @@
 package UseCaseUserCommand
 
 import (
+	"Domic.Domain/Commons/Contracts"
 	"Domic.Domain/Commons/DTOs"
-	"Domic.UseCase/Commons/Contracts"
 	"time"
 )
 
 type SignInCommandHandler struct {
-	jsonWebToken UseCaseCommonContract.IJsonWebToken
+	jsonWebToken DomainCommonContract.IJsonWebToken
 }
 
 func (signInCommandHandler *SignInCommandHandler) Handle(command *SignInCommand) DomainCommonDTO.Results[string] {
@@ -29,6 +29,6 @@ func (signInCommandHandler *SignInCommandHandler) Handle(command *SignInCommand)
 
 }
 
-func NewSignInCommandHandler(jsonWebToken UseCaseCommonContract.IJsonWebToken) *SignInCommandHandler {
+func NewSignInCommandHandler(jsonWebToken DomainCommonContract.IJsonWebToken) *SignInCommandHandler {
 	return &SignInCommandHandler{jsonWebToken: jsonWebToken}
 }

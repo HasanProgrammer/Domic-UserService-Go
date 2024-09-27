@@ -1,4 +1,4 @@
-package UseCaseCommonContract
+package DomainCommonContract
 
 import DomainCommonDTO "Domic.Domain/Commons/DTOs"
 

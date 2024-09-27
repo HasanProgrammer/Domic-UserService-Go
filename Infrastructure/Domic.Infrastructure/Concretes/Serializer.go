@@ -1,28 +1,32 @@
 package InfrastructureConcrete
 
 import (
-	"encoding/json"
+	"github.com/json-iterator/go"
 )
 
 type Serializer struct{}
 
 func (serializer *Serializer) Serialize(object interface{}) (string, error) {
 
-	bytes, err := json.Marshal(object)
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
+
+	content, err := json.MarshalToString(&object)
 
 	if err != nil {
 		return "", err
 	}
 
-	return string(bytes), nil
+	return content, nil
 
 }
 
 func (serializer *Serializer) Deserialize(stringifyPayload string, targetObject interface{}) error {
 
-	bytes := []byte(stringifyPayload)
+	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
-	return json.Unmarshal(bytes, targetObject)
+	err := json.UnmarshalFromString(stringifyPayload, &targetObject)
+
+	return err
 
 }
 
