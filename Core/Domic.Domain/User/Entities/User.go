@@ -147,21 +147,7 @@ func NewUser(idGenerator DomainCommonContract.IGlobalIdentityGenerator, serializ
 
 	//producing event
 
-	eventPayload, err := serializer.Serialize(struct {
-		Id          string     `json:"id"`
-		FirstName   string     `json:"firstName"`
-		LastName    string     `json:"lastName"`
-		Username    string     `json:"username"`
-		Password    string     `json:"password"`
-		Email       string     `json:"email"`
-		IsActive    bool       `json:"isActive"`
-		CreatedAt   time.Time  `json:"createdAt"`
-		CreatedBy   string     `json:"createdBy"`
-		CreatedRole string     `json:"createdRole"`
-		UpdatedAt   *time.Time `json:"updatedAt"`
-		UpdatedBy   string     `json:"updatedBy"`
-		UpdatedRole *string    `json:"updatedRole"`
-	}{
+	eventPayload, err := serializer.Serialize(StringifyUser{
 		Id:          user.id,
 		FirstName:   user.firstName,
 		LastName:    user.lastName,
