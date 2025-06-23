@@ -1,0 +1,9 @@
+go 1.23
+
+use (
+	.
+	./../../Infrastructure/domic.infrastructure
+	./../../Core/domic.usecase
+	./../../Core/domic.domain
+	./../../Core/domic.common
+)

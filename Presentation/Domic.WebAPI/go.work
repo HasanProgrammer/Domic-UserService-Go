@@ -1,9 +1,0 @@
-go 1.22
-
-use (
-	.
-	./../../Infrastructure/Domic.Infrastructure
-	./../../Core/Domic.UseCase
-	./../../Core/Domic.Domain
-	./../../Core/Domic.Common
-)
