@@ -4,6 +4,5 @@ use (
 	./../../Core/domic.common
 	./../../Core/domic.domain
 	./../../Core/domic.usecase
-	./../domic.persistence
 	.
 )

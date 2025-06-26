@@ -31,7 +31,7 @@ type CreateCommandHandler struct {
 	idGenerator     CommonInterface.IIdentityGenerator
 }
 
-func (createCommandHandler *CreateCommandHandler) Handle(command *CreateCommand) *DTOs.Results[bool] {
+func (createCommandHandler *CreateCommandHandler) Handle(command *CreateCommand) *DTOs.Result[bool] {
 
 	//validation
 
@@ -68,17 +68,17 @@ func NewCreateCommandHandler(
 
 /*-------------------------------------------------------------------*/
 
-func commandValidation(command *CreateCommand, repository UserInterface.IUserRepository[string]) *DTOs.Results[bool] {
+func commandValidation(command *CreateCommand, repository UserInterface.IUserRepository[string]) *DTOs.Result[bool] {
 
 	targetUser := repository.IsExistByUsername(command.Username)
 
 	if len(targetUser.Errors) > 0 {
-		return &DTOs.Results[bool]{
+		return &DTOs.Result[bool]{
 			Errors: targetUser.Errors,
 			Result: false,
 		}
 	} else if targetUser.Result {
-		return &DTOs.Results[bool]{
+		return &DTOs.Result[bool]{
 			Errors: []error{errors.New("نام کاربری قبلا انتخاب شده است")},
 			Result: false,
 		}
@@ -87,12 +87,12 @@ func commandValidation(command *CreateCommand, repository UserInterface.IUserRep
 	targetUser = repository.IsExistByPhoneNumber(command.PhoneNumber)
 
 	if len(targetUser.Errors) > 0 {
-		return &DTOs.Results[bool]{
+		return &DTOs.Result[bool]{
 			Errors: targetUser.Errors,
 			Result: false,
 		}
 	} else if targetUser.Result {
-		return &DTOs.Results[bool]{
+		return &DTOs.Result[bool]{
 			Errors: []error{errors.New("شماره تماس قبلا انتخاب شده است")},
 			Result: false,
 		}
@@ -101,18 +101,18 @@ func commandValidation(command *CreateCommand, repository UserInterface.IUserRep
 	targetUser = repository.IsExistByEmail(command.EMail)
 
 	if len(targetUser.Errors) > 0 {
-		return &DTOs.Results[bool]{
+		return &DTOs.Result[bool]{
 			Errors: targetUser.Errors,
 			Result: false,
 		}
 	} else if targetUser.Result {
-		return &DTOs.Results[bool]{
+		return &DTOs.Result[bool]{
 			Errors: []error{errors.New("پست الکترونیکی قبلا انتخاب شده است")},
 			Result: false,
 		}
 	}
 
-	return &DTOs.Results[bool]{
+	return &DTOs.Result[bool]{
 		Errors: []error{},
 		Result: true,
 	}

@@ -1,6 +1,6 @@
 package DTOs
 
-type Results[TResult any] struct {
+type Result[TResult any] struct {
 	Errors []error
 	Result TResult
 }

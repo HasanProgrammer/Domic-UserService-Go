@@ -2,68 +2,61 @@ package Entities
 
 import "time"
 
-type Event[TIdentity any] struct {
-	id          string
-	name        string
-	service     string
-	table       string
-	action      string
-	payload     string
-	createdAt   time.Time
-	createdBy   TIdentity
-	createdRole string
+type Event struct {
+	id      string
+	name    string
+	service string
+	table   string
+	action  string
+	payload string
+
+	//audit
+
+	createdAt time.Time
+	updatedAt *string
+	isActive  bool
 }
 
-func (e *Event[TIdentity]) GetId() string {
+func (e *Event) GetId() string {
 	return e.id
 }
 
-func (e *Event[TIdentity]) GetName() string {
+func (e *Event) GetName() string {
 	return e.name
 }
 
-func (e *Event[TIdentity]) GetService() string {
+func (e *Event) GetService() string {
 	return e.service
 }
 
-func (e *Event[TIdentity]) GetTable() string {
+func (e *Event) GetTable() string {
 	return e.table
 }
 
-func (e *Event[TIdentity]) GetAction() string {
+func (e *Event) GetAction() string {
 	return e.action
 }
 
-func (e *Event[TIdentity]) GetPayload() string {
+func (e *Event) GetPayload() string {
 	return e.payload
 }
 
-func (e *Event[TIdentity]) GetCreatedAt() time.Time {
+func (e *Event) GetCreatedAt() time.Time {
 	return e.createdAt
 }
 
-func (e *Event[TIdentity]) GetCreatedBy() TIdentity {
-	return e.createdBy
-}
+func NewEvent(id string, name string, service string, table string, action string, payload string,
+	createdAt time.Time,
+) *Event {
 
-func (e *Event[TIdentity]) GetCreatedRole() string {
-	return e.createdRole
-}
-
-func NewEvent[TIdentity any](id string, name string, service string, table string, action string, payload string,
-	createdAt time.Time, createdBy TIdentity, createdRole string,
-) *Event[TIdentity] {
-
-	return &Event[TIdentity]{
-		id:          id,
-		name:        name,
-		service:     service,
-		table:       table,
-		action:      action,
-		payload:     payload,
-		createdAt:   createdAt,
-		createdBy:   createdBy,
-		createdRole: createdRole,
+	return &Event{
+		id:        id,
+		name:      name,
+		service:   service,
+		table:     table,
+		action:    action,
+		payload:   payload,
+		createdAt: createdAt,
 	}
 
 }
