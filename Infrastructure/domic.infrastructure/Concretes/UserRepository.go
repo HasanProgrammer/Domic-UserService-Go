@@ -184,7 +184,6 @@ func (repository *UserRepository) FindAll(paginationRequest *DTOs.PaginationRequ
 			HasNext:   paginationRequest.PageIndex < totalPages,
 			HasPrev:   paginationRequest.PageIndex > 1,
 		},
-		Errors: []error{queryResult.Error},
 	}
 
 }
