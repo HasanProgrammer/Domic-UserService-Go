@@ -15,7 +15,7 @@ func (repository *UserRepository) Add(entity *Entities.User) *DTOs.Result[bool] 
 
 	userModel := Models.MapUserEntityToModel(entity)
 
-	queryResult := repository.db.Create(userModel)
+	queryResult := repository.db.Model(&Models.UserModel{}).Create(userModel)
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[bool]{
@@ -34,7 +34,7 @@ func (repository *UserRepository) AddRange(entities []*Entities.User) *DTOs.Resu
 
 	models := Models.MapUserEntitiesToModel(entities)
 
-	queryResult := repository.db.CreateInBatches(models, len(entities))
+	queryResult := repository.db.Model(&Models.UserModel{}).CreateInBatches(models, len(entities))
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[bool]{
@@ -53,7 +53,7 @@ func (repository *UserRepository) Change(entity *Entities.User) *DTOs.Result[boo
 
 	model := Models.MapUserEntityToModel(entity)
 
-	queryResult := repository.db.Updates(model)
+	queryResult := repository.db.Model(&Models.UserModel{}).Updates(model)
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[bool]{
@@ -76,7 +76,7 @@ func (repository *UserRepository) ChangeRange(entities []*Entities.User) *DTOs.R
 
 	for model := range models {
 
-		queryResult := repository.db.Updates(model)
+		queryResult := repository.db.Model(&Models.UserModel{}).Updates(model)
 
 		if queryResult.Error != nil {
 			errors = append(errors, queryResult.Error)
@@ -99,7 +99,7 @@ func (repository *UserRepository) Remove(entity *Entities.User) *DTOs.Result[boo
 
 	model := Models.MapUserEntityToModel(entity)
 
-	queryResult := repository.db.Delete(model, model.Id)
+	queryResult := repository.db.Model(&Models.UserModel{}).Delete(model, model.Id)
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[bool]{
@@ -120,7 +120,7 @@ func (repository *UserRepository) RemoveRange(entities []*Entities.User) *DTOs.R
 
 	for _, model := range models {
 
-		queryResult := repository.db.Delete(model, model.Id)
+		queryResult := repository.db.Model(&Models.UserModel{}).Delete(model, model.Id)
 
 		if queryResult.Error != nil {
 			errors = append(errors, queryResult.Error)
@@ -168,7 +168,7 @@ func (repository *UserRepository) FindAll(paginationRequest *DTOs.PaginationRequ
 
 	var userModels []Models.UserModel
 
-	countOfItem := repository.db.Count(&total)
+	countOfItem := repository.db.Model(&Models.UserModel{}).Count(&total)
 
 	if countOfItem.Error != nil {
 		return &DTOs.Result[*DTOs.PaginationResponse[*Entities.User]]{
@@ -179,7 +179,7 @@ func (repository *UserRepository) FindAll(paginationRequest *DTOs.PaginationRequ
 
 	totalPages := int(total / int64(paginationRequest.PageSize))
 
-	queryResult := repository.db.Limit(paginationRequest.PageSize).Offset(offset).Find(&userModels)
+	queryResult := repository.db.Model(&Models.UserModel{}).Limit(paginationRequest.PageSize).Offset(offset).Find(&userModels)
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[*DTOs.PaginationResponse[*Entities.User]]{
