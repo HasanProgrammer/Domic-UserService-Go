@@ -25,17 +25,15 @@ type CreateCommand struct {
 }
 
 type CreateCommandHandler struct {
-	unitOfWork      CommonInterface.IUnitOfWork
-	userRepository  UserInterface.IUserRepository[string]
-	eventRepository CommonInterface.IEventRepository[string]
-	idGenerator     CommonInterface.IIdentityGenerator
+	unitOfWork  CommonInterface.IUnitOfWork
+	idGenerator CommonInterface.IIdentityGenerator
 }
 
-func (createCommandHandler *CreateCommandHandler) Handle(command *CreateCommand) *DTOs.Result[bool] {
+func (handler *CreateCommandHandler) Handle(command *CreateCommand) *DTOs.Result[bool] {
 
 	//validation
 
-	validateResult := commandValidation(command, createCommandHandler.userRepository)
+	validateResult := commandValidation(command, handler.unitOfWork.UserRepository())
 
 	if !validateResult.Result {
 		return validateResult
@@ -43,32 +41,42 @@ func (createCommandHandler *CreateCommandHandler) Handle(command *CreateCommand)
 
 	//endValidation
 
-	newUser := Entities.NewUser(createCommandHandler.idGenerator,
+	newUser := Entities.NewUser(handler.idGenerator,
 		command.FirstName, command.LastName, command.Username, command.Password,
 		command.EMail, command.CreatedBy, command.CreatedRole,
 	)
 
-	createCommandHandler.eventRepository.AddRange(newUser.GetEvents())
+	txResult := handler.unitOfWork.StartTransaction()
 
-	return createCommandHandler.userRepository.Add(newUser)
+	if !txResult.Result {
+		return txResult
+	}
 
+	handler.unitOfWork.EventRepository().AddRange(newUser.GetEvents())
+	handler.unitOfWork.UserRepository().Add(newUser)
+
+	commitResult := handler.unitOfWork.Commit()
+
+	if !commitResult.Result {
+		return handler.unitOfWork.RollBack()
+	}
+
+	return commitResult
 }
 
 func NewCreateCommandHandler(
-	userRepository UserInterface.IUserRepository[string],
-	eventRepository CommonInterface.IEventRepository[string],
+	unitOfWork CommonInterface.IUnitOfWork,
 	idGenerator CommonInterface.IIdentityGenerator,
 ) *CreateCommandHandler {
 	return &CreateCommandHandler{
-		userRepository:  userRepository,
-		eventRepository: eventRepository,
-		idGenerator:     idGenerator,
+		unitOfWork:  unitOfWork,
+		idGenerator: idGenerator,
 	}
 }
 
 /*-------------------------------------------------------------------*/
 
-func commandValidation(command *CreateCommand, repository UserInterface.IUserRepository[string]) *DTOs.Result[bool] {
+func commandValidation(command *CreateCommand, repository UserInterface.IUserRepository) *DTOs.Result[bool] {
 
 	targetUser := repository.IsExistByUsername(command.Username)
 

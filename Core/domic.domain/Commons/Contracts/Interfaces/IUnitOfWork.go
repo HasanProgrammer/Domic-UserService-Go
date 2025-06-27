@@ -11,4 +11,5 @@ type IUnitOfWork interface {
 	RollBack() *DTOs.Result[bool]
 
 	UserRepository() Interfaces.IUserRepository
+	EventRepository() IEventRepository
 }
