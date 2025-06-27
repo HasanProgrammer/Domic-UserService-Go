@@ -1,9 +1,14 @@
 package Interfaces
 
-import "domic.domain/Commons/DTOs"
+import (
+	"domic.domain/Commons/DTOs"
+	"domic.domain/User/Contracts/Interfaces"
+)
 
 type IUnitOfWork interface {
-	BeginTransaction() *DTOs.Result[bool]
+	StartTransaction() *DTOs.Result[bool]
 	Commit() *DTOs.Result[bool]
 	RollBack() *DTOs.Result[bool]
+
+	UserRepository() Interfaces.IUserRepository
 }

@@ -10,22 +10,22 @@ type UserModel struct {
 	gorm.Model
 
 	Id        string `gorm:"primaryKey"`
-	FirstName string
-	LastName  string
-	Username  string
-	Password  string
-	Email     string
-	IsActive  bool
+	FirstName string `gorm:"column:FirstName;type:varchar(80); not null"`
+	LastName  string `gorm:"column:LastName;type:varchar(100); not null"`
+	Username  string `gorm:"column:Username;type:varchar(20); not null"`
+	Password  string `gorm:"column:Password;not null"`
+	Email     string `gorm:"column:Email;not null"`
+	IsActive  bool   `gorm:"column:IsActive"`
 
 	//audit fields
 
-	CreatedAt   time.Time
-	CreatedBy   string
-	CreatedRole string
+	CreatedAt   time.Time `gorm:"column:CreatedAt"`
+	CreatedBy   string    `gorm:"column:CreatedBy"`
+	CreatedRole string    `gorm:"column:CreatedRole"`
 
-	UpdatedAt   *time.Time
-	UpdatedBy   *string
-	UpdatedRole *string
+	UpdatedAt   *time.Time `gorm:"column:UpdatedAt"`
+	UpdatedBy   *string    `gorm:"column:UpdatedBy"`
+	UpdatedRole *string    `gorm:"column:UpdatedRole"`
 }
 
 func MapUserEntityToModel(user *Entities.User) *UserModel {
@@ -46,6 +46,36 @@ func MapUserEntityToModel(user *Entities.User) *UserModel {
 	}
 }
 
+func MapUserEntitiesToModel(users []*Entities.User) []*UserModel {
+
+	var models []*UserModel
+
+	for _, user := range users {
+
+		model := &UserModel{
+			Id:          user.GetId(),
+			FirstName:   user.GetFirstName(),
+			LastName:    user.GetLastName(),
+			Username:    user.GetUsername(),
+			Password:    user.GetPassword(),
+			Email:       user.GetEmail(),
+			CreatedBy:   user.GetCreatedBy(),
+			CreatedAt:   user.GetCreatedAt(),
+			CreatedRole: user.GetCreatedRole(),
+			UpdatedBy:   user.GetUpdatedBy(),
+			UpdatedAt:   user.GetUpdatedAt(),
+			UpdatedRole: user.GetUpdatedRole(),
+			IsActive:    user.GetIsActive(),
+		}
+
+		models = append(models, model)
+
+	}
+
+	return models
+
+}
+
 func MapUserModelToEntity(model *UserModel) *Entities.User {
 	return Entities.AssembleUser(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
 		model.Email, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole, model.UpdatedAt,
@@ -58,11 +88,15 @@ func MapUserModelsToEntity(models []UserModel) []*Entities.User {
 
 	for _, model := range models {
 
-		users = append(users, Entities.AssembleUser(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
-			model.Email, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole, model.UpdatedAt,
-		))
+		userEntity := Entities.AssembleUser(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
+			model.Email, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole,
+			model.UpdatedAt,
+		)
+
+		users = append(users, userEntity)
 
 	}
 
 	return users
+
 }

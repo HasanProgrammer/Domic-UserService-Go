@@ -1,4 +1,4 @@
-package InfrastructureConcrete
+package Concrete
 
 import (
 	"domic.domain/Commons/DTOs"
@@ -32,7 +32,9 @@ func (repository *UserRepository) Add(entity *Entities.User) *DTOs.Result[bool] 
 
 func (repository *UserRepository) AddRange(entities []*Entities.User) *DTOs.Result[bool] {
 
-	queryResult := repository.db.CreateInBatches(entities, len(entities))
+	models := Models.MapUserEntitiesToModel(entities)
+
+	queryResult := repository.db.CreateInBatches(models, len(entities))
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[bool]{
@@ -49,7 +51,9 @@ func (repository *UserRepository) AddRange(entities []*Entities.User) *DTOs.Resu
 
 func (repository *UserRepository) Change(entity *Entities.User) *DTOs.Result[bool] {
 
-	queryResult := repository.db.Updates(entity)
+	model := Models.MapUserEntityToModel(entity)
+
+	queryResult := repository.db.Updates(model)
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[bool]{
@@ -68,9 +72,11 @@ func (repository *UserRepository) ChangeRange(entities []*Entities.User) *DTOs.R
 
 	var errors []error
 
-	for user := range entities {
+	models := Models.MapUserEntitiesToModel(entities)
 
-		queryResult := repository.db.Updates(user)
+	for model := range models {
+
+		queryResult := repository.db.Updates(model)
 
 		if queryResult.Error != nil {
 			errors = append(errors, queryResult.Error)
@@ -91,11 +97,18 @@ func (repository *UserRepository) ChangeRange(entities []*Entities.User) *DTOs.R
 
 func (repository *UserRepository) Remove(entity *Entities.User) *DTOs.Result[bool] {
 
-	queryResult := repository.db.Updates(user)
+	model := Models.MapUserEntityToModel(entity)
+
+	queryResult := repository.db.Delete(model, model.Id)
 
 	if queryResult.Error != nil {
-		errors = append(errors, queryResult.Error)
+		return &DTOs.Result[bool]{
+			Result: false,
+			Errors: []error{queryResult.Error},
+		}
 	}
+
+	return &DTOs.Result[bool]{Result: true}
 
 }
 
@@ -103,11 +116,11 @@ func (repository *UserRepository) RemoveRange(entities []*Entities.User) *DTOs.R
 
 	var errors []error
 
-	for _, user := range entities {
+	models := Models.MapUserEntitiesToModel(entities)
 
-		userModel := Models.MapUserEntityToModel(user)
+	for _, model := range models {
 
-		queryResult := repository.db.Delete(userModel, userModel.Id)
+		queryResult := repository.db.Delete(model, model.Id)
 
 		if queryResult.Error != nil {
 			errors = append(errors, queryResult.Error)
