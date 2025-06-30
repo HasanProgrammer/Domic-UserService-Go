@@ -1,6 +1,9 @@
 package Entities
 
-import "time"
+import (
+	"domic.domain/Commons/Contracts/Interfaces"
+	"time"
+)
 
 type Event struct {
 	id      string
@@ -13,7 +16,7 @@ type Event struct {
 	//audit
 
 	createdAt time.Time
-	updatedAt *string
+	updatedAt *time.Time
 	isActive  bool
 }
 
@@ -45,8 +48,26 @@ func (e *Event) GetCreatedAt() time.Time {
 	return e.createdAt
 }
 
-func NewEvent(id string, name string, service string, table string, action string, payload string,
-	createdAt time.Time,
+func New(idGenerator Interfaces.IIdentityGenerator, name string, service string, table string, action string,
+	payload string, createdAt time.Time,
+) *Event {
+
+	id := idGenerator.GetRandom(4)
+
+	return &Event{
+		id:        id,
+		name:      name,
+		service:   service,
+		table:     table,
+		action:    action,
+		payload:   payload,
+		createdAt: createdAt,
+	}
+
+}
+
+func Assemble(id string, name string, service string, table string, action string, payload string, createdAt time.Time,
+	updatedAt *time.Time, isActive bool,
 ) *Event {
 
 	return &Event{
@@ -57,6 +78,8 @@ func NewEvent(id string, name string, service string, table string, action strin
 		action:    action,
 		payload:   payload,
 		createdAt: createdAt,
+		updatedAt: updatedAt,
+		isActive:  isActive,
 	}
 
 }
