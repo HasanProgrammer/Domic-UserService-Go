@@ -1,6 +1,7 @@
 package Concrete
 
 import (
+	CommonInterface "domic.domain/Commons/Contracts/Interfaces"
 	"domic.domain/Commons/DTOs"
 	"domic.domain/User/Contracts/Interfaces"
 	"gorm.io/driver/sqlserver"
@@ -58,6 +59,16 @@ func (unitOfWork *UnitOfWork) RollBack() *DTOs.Result[bool] {
 }
 
 func (unitOfWork *UnitOfWork) UserRepository() Interfaces.IUserRepository {
+
+	if unitOfWork.tx == nil {
+		return NewUserRepository(unitOfWork.db)
+	} else {
+		return NewUserRepository(unitOfWork.tx)
+	}
+
+}
+
+func (unitOfWork *UnitOfWork) EventRepository() CommonInterface.IEventRepository {
 
 	if unitOfWork.tx == nil {
 		return NewUserRepository(unitOfWork.db)

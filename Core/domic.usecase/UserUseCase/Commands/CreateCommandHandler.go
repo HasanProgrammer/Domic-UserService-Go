@@ -80,12 +80,7 @@ func commandValidation(command *CreateCommand, repository UserInterface.IUserRep
 
 	targetUser := repository.IsExistByUsername(command.Username)
 
-	if len(targetUser.Errors) > 0 {
-		return &DTOs.Result[bool]{
-			Errors: targetUser.Errors,
-			Result: false,
-		}
-	} else if targetUser.Result {
+	if !targetUser.Result {
 		return &DTOs.Result[bool]{
 			Errors: []error{errors.New("نام کاربری قبلا انتخاب شده است")},
 			Result: false,
@@ -94,12 +89,7 @@ func commandValidation(command *CreateCommand, repository UserInterface.IUserRep
 
 	targetUser = repository.IsExistByPhoneNumber(command.PhoneNumber)
 
-	if len(targetUser.Errors) > 0 {
-		return &DTOs.Result[bool]{
-			Errors: targetUser.Errors,
-			Result: false,
-		}
-	} else if targetUser.Result {
+	if !targetUser.Result {
 		return &DTOs.Result[bool]{
 			Errors: []error{errors.New("شماره تماس قبلا انتخاب شده است")},
 			Result: false,
@@ -108,12 +98,7 @@ func commandValidation(command *CreateCommand, repository UserInterface.IUserRep
 
 	targetUser = repository.IsExistByEmail(command.EMail)
 
-	if len(targetUser.Errors) > 0 {
-		return &DTOs.Result[bool]{
-			Errors: targetUser.Errors,
-			Result: false,
-		}
-	} else if targetUser.Result {
+	if !targetUser.Result {
 		return &DTOs.Result[bool]{
 			Errors: []error{errors.New("پست الکترونیکی قبلا انتخاب شده است")},
 			Result: false,

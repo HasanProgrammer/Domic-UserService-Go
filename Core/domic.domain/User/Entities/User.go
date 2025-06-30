@@ -7,85 +7,73 @@ import (
 )
 
 type User struct {
-	events    []*Entities.Event
-	id        string
+	Entities.BaseEntity
+
 	firstName string
 	lastName  string
 	username  string
 	password  string
 	email     string
-	isActive  bool
-
-	//audit fields
-
-	createdAt   time.Time
-	createdBy   string
-	createdRole string
-
-	updatedAt   *time.Time
-	updatedBy   *string
-	updatedRole *string
 }
 
-func NewUser(idGenerator Interfaces.IIdentityGenerator, firstName string, lastName string,
+func New(idGenerator Interfaces.IIdentityGenerator, firstName string, lastName string,
 	username string, password string, email string, createdBy string, createdRole string,
 ) *User {
 
 	id := idGenerator.GetRandom(4)
 	nowTime := time.Now()
 
-	user := &User{
-		id:          id,
-		firstName:   firstName,
-		lastName:    lastName,
-		username:    username,
-		password:    password,
-		email:       email,
-		createdAt:   nowTime,
-		createdBy:   createdBy,
-		createdRole: createdRole,
-	}
+	user := &User{}
+
+	user.BaseEntity.SetId(id)
+	user.BaseEntity.SetCreatedBy(createdBy)
+	user.BaseEntity.SetCreatedRole(createdRole)
+	user.BaseEntity.SetCreatedAt(nowTime)
+
+	user.firstName = firstName
+	user.lastName = lastName
+	user.username = username
+	user.password = password
+	user.email = email
 
 	//producing event
 
-	user.events = append(user.events,
-		Entities.NewEvent(id, "UserCreated", "UserService", "User", "CREATE", "", nowTime),
-	)
+	user.BaseEntity.AppendEvent(Entities.NewEvent(id, "UserCreated", "UserService", "User", "CREATE", "", nowTime))
 
 	return user
 }
 
-func AssembleUser(id string, firstName string, lastName string,
+func Assemble(id string, firstName string, lastName string,
 	username string, password string, email string, createdBy string, createdRole string, createdAt time.Time,
 	updatedBy *string, updatedRole *string, updatedAt *time.Time,
 ) *User {
 
-	nowTime := time.Now()
+	user := &User{}
 
-	user := &User{
-		id:          id,
-		firstName:   firstName,
-		lastName:    lastName,
-		username:    username,
-		password:    password,
-		email:       email,
-		createdBy:   createdBy,
-		createdRole: createdRole,
-		createdAt:   nowTime,
-		updatedBy:   updatedBy,
-		updatedRole: updatedRole,
-		updatedAt:   updatedAt,
-	}
+	user.BaseEntity.SetId(id)
+	user.BaseEntity.SetCreatedBy(createdBy)
+	user.BaseEntity.SetCreatedRole(createdRole)
+	user.BaseEntity.SetCreatedAt(createdAt)
+	user.BaseEntity.SetUpdatedBy(updatedBy)
+	user.BaseEntity.SetUpdatedRole(updatedRole)
+	user.BaseEntity.SetUpdatedAt(updatedAt)
+
+	user.firstName = firstName
+	user.lastName = lastName
+	user.username = username
+	user.password = password
+	user.email = email
 
 	return user
+
 }
 
 func (user *User) GetEvents() []*Entities.Event {
-	return user.events
+	return user.BaseEntity.Events()
 }
 
 func (user *User) GetId() string {
-	return user.id
+	return user.BaseEntity.Id()
 }
 
 func (user *User) GetFirstName() string {
@@ -109,29 +97,29 @@ func (user *User) GetEmail() string {
 }
 
 func (user *User) GetIsActive() bool {
-	return user.isActive
+	return user.BaseEntity.IsActive()
 }
 
 func (user *User) GetCreatedAt() time.Time {
-	return user.createdAt
+	return user.BaseEntity.CreatedAt()
 }
 
 func (user *User) GetCreatedBy() string {
-	return user.createdBy
+	return user.BaseEntity.CreatedBy()
 }
 
 func (user *User) GetCreatedRole() string {
-	return user.createdRole
+	return user.BaseEntity.CreatedRole()
 }
 
 func (user *User) GetUpdatedAt() *time.Time {
-	return user.updatedAt
+	return user.BaseEntity.UpdatedAt()
 }
 
 func (user *User) GetUpdatedBy() *string {
-	return user.updatedBy
+	return user.BaseEntity.UpdatedBy()
 }
 
 func (user *User) GetUpdatedRole() *string {
-	return user.updatedRole
+	return user.BaseEntity.UpdatedRole()
 }
