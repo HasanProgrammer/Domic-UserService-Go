@@ -160,6 +160,10 @@ func (repository *EventRepository) FindById(id string) *DTOs.Result[*Entities.Ev
 
 }
 
-func New(db *gorm.DB) *EventRepository {
+func (repository *EventRepository) FindAll(paginationRequest *DTOs.PaginationRequest) *DTOs.Result[*DTOs.PaginationResponse[*Entities.Event]] {
+
+}
+
+func NewEventRepository(db *gorm.DB) *EventRepository {
 	return &EventRepository{db: db}
 }

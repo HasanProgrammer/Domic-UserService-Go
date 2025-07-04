@@ -25,7 +25,6 @@ func (unitOfWork *UnitOfWork) StartTransaction() *DTOs.Result[bool] {
 	}
 
 	return &DTOs.Result[bool]{Result: true}
-
 }
 
 func (unitOfWork *UnitOfWork) Commit() *DTOs.Result[bool] {
@@ -71,9 +70,9 @@ func (unitOfWork *UnitOfWork) UserRepository() Interfaces.IUserRepository {
 func (unitOfWork *UnitOfWork) EventRepository() CommonInterface.IEventRepository {
 
 	if unitOfWork.tx == nil {
-		return NewUserRepository(unitOfWork.db)
+		return NewEventRepository(unitOfWork.db)
 	} else {
-		return NewUserRepository(unitOfWork.tx)
+		return NewEventRepository(unitOfWork.tx)
 	}
 
 }
