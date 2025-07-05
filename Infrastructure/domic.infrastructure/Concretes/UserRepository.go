@@ -13,9 +13,9 @@ type UserRepository struct {
 
 func (repository *UserRepository) Add(entity *Entities.User) *DTOs.Result[bool] {
 
-	userModel := Models.MapUserEntityToModel(entity)
+	model := Models.ConvertUserEntityToModel(entity)
 
-	queryResult := repository.db.Model(&Models.UserModel{}).Create(userModel)
+	queryResult := repository.db.Model(&Models.UserModel{}).Create(model)
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[bool]{
@@ -32,7 +32,7 @@ func (repository *UserRepository) Add(entity *Entities.User) *DTOs.Result[bool] 
 
 func (repository *UserRepository) AddRange(entities []*Entities.User) *DTOs.Result[bool] {
 
-	models := Models.MapUserEntitiesToModel(entities)
+	models := Models.ConvertUserEntitiesToModels(entities)
 
 	queryResult := repository.db.Model(&Models.UserModel{}).CreateInBatches(models, len(entities))
 
@@ -51,7 +51,7 @@ func (repository *UserRepository) AddRange(entities []*Entities.User) *DTOs.Resu
 
 func (repository *UserRepository) Change(entity *Entities.User) *DTOs.Result[bool] {
 
-	model := Models.MapUserEntityToModel(entity)
+	model := Models.ConvertUserEntityToModel(entity)
 
 	queryResult := repository.db.Model(&Models.UserModel{}).Updates(model)
 
@@ -72,7 +72,7 @@ func (repository *UserRepository) ChangeRange(entities []*Entities.User) *DTOs.R
 
 	var errors []error
 
-	models := Models.MapUserEntitiesToModel(entities)
+	models := Models.ConvertUserEntitiesToModels(entities)
 
 	for model := range models {
 
@@ -97,7 +97,7 @@ func (repository *UserRepository) ChangeRange(entities []*Entities.User) *DTOs.R
 
 func (repository *UserRepository) Remove(entity *Entities.User) *DTOs.Result[bool] {
 
-	model := Models.MapUserEntityToModel(entity)
+	model := Models.ConvertUserEntityToModel(entity)
 
 	queryResult := repository.db.Model(&Models.UserModel{}).Delete(model, model.Id)
 
@@ -116,7 +116,7 @@ func (repository *UserRepository) RemoveRange(entities []*Entities.User) *DTOs.R
 
 	var errors []error
 
-	models := Models.MapUserEntitiesToModel(entities)
+	models := Models.ConvertUserEntitiesToModels(entities)
 
 	for _, model := range models {
 
@@ -143,9 +143,9 @@ func (repository *UserRepository) RemoveRange(entities []*Entities.User) *DTOs.R
 
 func (repository *UserRepository) FindById(id string) *DTOs.Result[*Entities.User] {
 
-	var userModel *Models.UserModel
+	var model *Models.UserModel
 
-	queryResult := repository.db.First(userModel, "id = ?", id)
+	queryResult := repository.db.First(model, "id = ?", id)
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[*Entities.User]{
@@ -155,7 +155,7 @@ func (repository *UserRepository) FindById(id string) *DTOs.Result[*Entities.Use
 	}
 
 	return &DTOs.Result[*Entities.User]{
-		Result: Models.MapUserModelToEntity(userModel),
+		Result: Models.ConvertUserModelToEntity(model),
 	}
 
 }
@@ -166,7 +166,7 @@ func (repository *UserRepository) FindAll(paginationRequest *DTOs.PaginationRequ
 
 	var total int64
 
-	var userModels []Models.UserModel
+	var models []Models.UserModel
 
 	countOfItem := repository.db.Model(&Models.UserModel{}).Count(&total)
 
@@ -179,7 +179,7 @@ func (repository *UserRepository) FindAll(paginationRequest *DTOs.PaginationRequ
 
 	totalPages := int(total / int64(paginationRequest.PageSize))
 
-	queryResult := repository.db.Model(&Models.UserModel{}).Limit(paginationRequest.PageSize).Offset(offset).Find(&userModels)
+	queryResult := repository.db.Model(&Models.UserModel{}).Limit(paginationRequest.PageSize).Offset(offset).Find(&models)
 
 	if queryResult.Error != nil {
 		return &DTOs.Result[*DTOs.PaginationResponse[*Entities.User]]{
@@ -192,7 +192,7 @@ func (repository *UserRepository) FindAll(paginationRequest *DTOs.PaginationRequ
 		Result: &DTOs.PaginationResponse[*Entities.User]{
 			PageSize:  paginationRequest.PageSize,
 			PageIndex: paginationRequest.PageIndex,
-			Items:     Models.MapUserModelsToEntity(userModels),
+			Items:     Models.ConvertUserModelsToEntities(models),
 			TotalItem: total,
 			HasNext:   paginationRequest.PageIndex < totalPages,
 			HasPrev:   paginationRequest.PageIndex > 1,
@@ -201,7 +201,7 @@ func (repository *UserRepository) FindAll(paginationRequest *DTOs.PaginationRequ
 
 }
 
-func (repository *UserRepository) IsExistById(username string) *DTOs.Result[bool] {
+func (repository *UserRepository) IsExistById(id string) *DTOs.Result[bool] {
 
 	return nil
 
@@ -209,19 +209,52 @@ func (repository *UserRepository) IsExistById(username string) *DTOs.Result[bool
 
 func (repository *UserRepository) IsExistByUsername(username string) *DTOs.Result[bool] {
 
-	return nil
+	var model *Models.UserModel
+
+	queryResult := repository.db.First(model, "Username = ?", username)
+
+	if queryResult.Error != nil || model == nil {
+		return &DTOs.Result[bool]{
+			Result: false,
+			Errors: []error{queryResult.Error},
+		}
+	}
+
+	return &DTOs.Result[bool]{Result: true}
 
 }
 
-func (repository *UserRepository) IsExistByPhoneNumber(username string) *DTOs.Result[bool] {
+func (repository *UserRepository) IsExistByPhoneNumber(phoneNumber string) *DTOs.Result[bool] {
 
-	return nil
+	var model *Models.UserModel
+
+	queryResult := repository.db.First(model, "PhoneNumber = ?", phoneNumber)
+
+	if queryResult.Error != nil || model == nil {
+		return &DTOs.Result[bool]{
+			Result: false,
+			Errors: []error{queryResult.Error},
+		}
+	}
+
+	return &DTOs.Result[bool]{Result: true}
 
 }
 
-func (repository *UserRepository) IsExistByEmail(username string) *DTOs.Result[bool] {
+func (repository *UserRepository) IsExistByEmail(email string) *DTOs.Result[bool] {
 
-	return nil
+	var model *Models.UserModel
+
+	queryResult := repository.db.First(model, "Email = ?", email)
+
+	if queryResult.Error != nil || model == nil {
+		return &DTOs.Result[bool]{
+			Result: false,
+			Errors: []error{queryResult.Error},
+		}
+	}
+
+	return &DTOs.Result[bool]{Result: true}
 
 }
 

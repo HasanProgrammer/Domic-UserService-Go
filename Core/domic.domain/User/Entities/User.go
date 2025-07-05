@@ -16,7 +16,7 @@ type User struct {
 	email     string
 }
 
-func New(idGenerator Interfaces.IIdentityGenerator, firstName string, lastName string,
+func NewUser(idGenerator Interfaces.IIdentityGenerator, firstName string, lastName string,
 	username string, password string, email string, createdBy string, createdRole string,
 ) *User {
 
@@ -38,7 +38,7 @@ func New(idGenerator Interfaces.IIdentityGenerator, firstName string, lastName s
 
 	//producing event
 
-	user.BaseEntity.AppendEvent(Entities.NewEvent(id, "UserCreated", "UserService", "User", "CREATE", "", nowTime))
+	user.BaseEntity.AppendEvent(Entities.NewEvent(idGenerator, "UserCreated", "UserService", "User", "CREATE", "", nowTime))
 
 	return user
 }

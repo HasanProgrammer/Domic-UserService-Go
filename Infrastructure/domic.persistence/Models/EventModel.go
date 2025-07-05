@@ -17,13 +17,23 @@ type EventModel struct {
 	IsActive  bool       `gorm:"column:IsActive"`
 }
 
-func MapEventEntityToModel(event *Entities.Event) *EventModel {
+func ConvertEventEntityToModel(event *Entities.Event) *EventModel {
 
-	return &EventModel{}
+	return &EventModel{
+		Id:        event.GetId(),
+		Name:      event.GetName(),
+		Service:   event.GetService(),
+		Table:     event.GetTable(),
+		Action:    event.GetAction(),
+		Payload:   event.GetPayload(),
+		IsActive:  event.GetIsActive(),
+		CreatedAt: event.GetCreatedAt(),
+		UpdatedAt: event.GetUpdatedAt(),
+	}
 
 }
 
-func MapEventEntitiesToModel(events []*Entities.Event) []*EventModel {
+func ConvertEventEntitiesToModels(events []*Entities.Event) []*EventModel {
 
 	var models []*EventModel
 
@@ -44,13 +54,13 @@ func MapEventEntitiesToModel(events []*Entities.Event) []*EventModel {
 
 }
 
-func MapEventModelToEntity(model *EventModel) *Entities.Event {
+func ConvertEventModelToEntity(model *EventModel) *Entities.Event {
 	return Entities.Assemble(model.Id, model.Name, model.Service, model.Table, model.Action, model.Payload,
 		model.CreatedAt, model.UpdatedAt, model.IsActive,
 	)
 }
 
-func MapEventModelsToEntity(models []EventModel) []*Entities.Event {
+func ConvertEventModelsToEntities(models []EventModel) []*Entities.Event {
 
 	var events []*Entities.Event
 

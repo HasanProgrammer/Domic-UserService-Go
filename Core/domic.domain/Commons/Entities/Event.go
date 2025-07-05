@@ -48,7 +48,15 @@ func (e *Event) GetCreatedAt() time.Time {
 	return e.createdAt
 }
 
-func New(idGenerator Interfaces.IIdentityGenerator, name string, service string, table string, action string,
+func (e *Event) GetUpdatedAt() *time.Time {
+	return e.updatedAt
+}
+
+func (e *Event) GetIsActive() bool {
+	return e.isActive
+}
+
+func NewEvent(idGenerator Interfaces.IIdentityGenerator, name string, service string, table string, action string,
 	payload string, createdAt time.Time,
 ) *Event {
 

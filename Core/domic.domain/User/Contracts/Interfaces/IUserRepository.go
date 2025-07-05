@@ -9,8 +9,8 @@ import (
 type IUserRepository interface {
 	Interfaces.IRepository[string, *Entities.User]
 
-	IsExistById(username string) *DTOs.Result[bool]
+	IsExistById(id string) *DTOs.Result[bool]
 	IsExistByUsername(username string) *DTOs.Result[bool]
-	IsExistByPhoneNumber(username string) *DTOs.Result[bool]
-	IsExistByEmail(username string) *DTOs.Result[bool]
+	IsExistByPhoneNumber(phoneNumber string) *DTOs.Result[bool]
+	IsExistByEmail(email string) *DTOs.Result[bool]
 }

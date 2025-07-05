@@ -15,7 +15,7 @@ type UserModel struct {
 	Email     string `gorm:"column:Email;not null"`
 }
 
-func MapUserEntityToModel(user *Entities.User) *UserModel {
+func ConvertUserEntityToModel(user *Entities.User) *UserModel {
 	model := &UserModel{}
 
 	model.FirstName = user.GetFirstName()
@@ -35,7 +35,7 @@ func MapUserEntityToModel(user *Entities.User) *UserModel {
 	return model
 }
 
-func MapUserEntitiesToModel(users []*Entities.User) []*UserModel {
+func ConvertUserEntitiesToModels(users []*Entities.User) []*UserModel {
 
 	var models []*UserModel
 
@@ -65,13 +65,13 @@ func MapUserEntitiesToModel(users []*Entities.User) []*UserModel {
 
 }
 
-func MapUserModelToEntity(model *UserModel) *Entities.User {
+func ConvertUserModelToEntity(model *UserModel) *Entities.User {
 	return Entities.Assemble(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
 		model.Email, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole, model.UpdatedAt,
 	)
 }
 
-func MapUserModelsToEntity(models []UserModel) []*Entities.User {
+func ConvertUserModelsToEntities(models []UserModel) []*Entities.User {
 
 	var users []*Entities.User
 

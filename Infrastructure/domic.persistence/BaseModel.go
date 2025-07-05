@@ -3,7 +3,7 @@ package persistence
 import "time"
 
 type BaseModel struct {
-	Id          string     `gorm:"primaryKey"`
+	Id          string     `gorm:"primaryKey;column:Id"`
 	CreatedAt   time.Time  `gorm:"column:CreatedAt"`
 	CreatedBy   string     `gorm:"column:CreatedBy"`
 	CreatedRole string     `gorm:"column:CreatedRole"`
