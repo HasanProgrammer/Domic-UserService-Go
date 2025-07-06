@@ -1,7 +1,7 @@
-package Models
+package models
 
 import (
-	"domic.domain/Commons/Entities"
+	"domic.domain/commons/entities"
 	"time"
 )
 
@@ -17,7 +17,7 @@ type EventModel struct {
 	IsActive  bool       `gorm:"column:IsActive"`
 }
 
-func ConvertEventEntityToModel(event *Entities.Event) *EventModel {
+func ConvertEventEntityToModel(event *entities.Event) *EventModel {
 
 	return &EventModel{
 		Id:        event.GetId(),
@@ -33,7 +33,7 @@ func ConvertEventEntityToModel(event *Entities.Event) *EventModel {
 
 }
 
-func ConvertEventEntitiesToModels(events []*Entities.Event) []*EventModel {
+func ConvertEventEntitiesToModels(events []*entities.Event) []*EventModel {
 
 	var models []*EventModel
 
@@ -54,19 +54,19 @@ func ConvertEventEntitiesToModels(events []*Entities.Event) []*EventModel {
 
 }
 
-func ConvertEventModelToEntity(model *EventModel) *Entities.Event {
-	return Entities.Assemble(model.Id, model.Name, model.Service, model.Table, model.Action, model.Payload,
+func ConvertEventModelToEntity(model *EventModel) *entities.Event {
+	return entities.Assemble(model.Id, model.Name, model.Service, model.Table, model.Action, model.Payload,
 		model.CreatedAt, model.UpdatedAt, model.IsActive,
 	)
 }
 
-func ConvertEventModelsToEntities(models []EventModel) []*Entities.Event {
+func ConvertEventModelsToEntities(models []EventModel) []*entities.Event {
 
-	var events []*Entities.Event
+	var events []*entities.Event
 
 	for _, model := range models {
 
-		eventEntity := Entities.Assemble(model.Id, model.Name, model.Service, model.Table, model.Action, model.Payload,
+		eventEntity := entities.Assemble(model.Id, model.Name, model.Service, model.Table, model.Action, model.Payload,
 			model.CreatedAt, model.UpdatedAt, model.IsActive,
 		)
 

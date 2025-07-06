@@ -1,9 +1,9 @@
-package contracts
+package interfaces
 
 import (
-	"domic.domain/commons/Entities"
+	"domic.domain/commons/entities"
 )
 
 type IEventRepository interface {
-	IRepository[string, *Entities.Event]
+	IRepository[string, *entities.Event]
 }

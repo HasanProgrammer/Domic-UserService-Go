@@ -1,16 +1,16 @@
-package contracts
+package interfaces
 
 import (
-	"domic.domain/commons/DTOs"
+	"domic.domain/commons/dtos"
 )
 
 type IRepository[TIdentity any, TEntity any] interface {
-	Add(entity TEntity) *DTOs.Result[bool]
-	AddRange(entities []TEntity) *DTOs.Result[bool]
-	Change(entity TEntity) *DTOs.Result[bool]
-	ChangeRange(entities []TEntity) *DTOs.Result[bool]
-	Remove(entity TEntity) *DTOs.Result[bool]
-	RemoveRange(entities []TEntity) *DTOs.Result[bool]
-	FindById(id TIdentity) *DTOs.Result[TEntity]
-	FindAll(paginationRequest *DTOs.PaginationRequest) *DTOs.Result[*DTOs.PaginationResponse[TEntity]]
+	Add(entity TEntity) *dtos.Result[bool]
+	AddRange(entities []TEntity) *dtos.Result[bool]
+	Change(entity TEntity) *dtos.Result[bool]
+	ChangeRange(entities []TEntity) *dtos.Result[bool]
+	Remove(entity TEntity) *dtos.Result[bool]
+	RemoveRange(entities []TEntity) *dtos.Result[bool]
+	FindById(id TIdentity) *dtos.Result[TEntity]
+	FindAll(paginationRequest *dtos.PaginationRequest) *dtos.Result[*dtos.PaginationResponse[TEntity]]
 }

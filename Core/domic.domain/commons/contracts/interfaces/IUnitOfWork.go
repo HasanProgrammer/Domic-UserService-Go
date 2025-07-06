@@ -1,14 +1,14 @@
-package contracts
+package interfaces
 
 import (
-	"domic.domain/commons/DTOs"
+	"domic.domain/commons/dtos"
 	"domic.domain/user/contracts/contracts"
 )
 
 type IUnitOfWork interface {
-	StartTransaction() *DTOs.Result[bool]
-	Commit() *DTOs.Result[bool]
-	RollBack() *DTOs.Result[bool]
+	StartTransaction() *dtos.Result[bool]
+	Commit() *dtos.Result[bool]
+	RollBack() *dtos.Result[bool]
 
 	UserRepository() contracts.IUserRepository
 	EventRepository() IEventRepository

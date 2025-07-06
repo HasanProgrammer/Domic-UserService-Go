@@ -1,14 +1,14 @@
-package UserUseCase
+package commands
 
 import (
-	CommonInterface "domic.domain/Commons/Contracts/Interfaces"
-	"domic.domain/Commons/DTOs"
-	UserInterface "domic.domain/User/Contracts/Interfaces"
-	"domic.domain/User/Entities"
+	CommonInterface "domic.domain/commons/contracts/interfaces"
+	"domic.domain/commons/dtos"
+	UserInterface "domic.domain/user/contracts/contracts"
+	"domic.domain/user/entities"
 	"errors"
 )
 
-type CreateCommand struct {
+type CreateUserCommand struct {
 	FirstName   string
 	LastName    string
 	Username    string
@@ -24,12 +24,12 @@ type CreateCommand struct {
 	CreatedRole string
 }
 
-type CreateCommandHandler struct {
+type CreateUserCommandHandler struct {
 	unitOfWork  CommonInterface.IUnitOfWork
 	idGenerator CommonInterface.IIdentityGenerator
 }
 
-func (handler *CreateCommandHandler) Handle(command *CreateCommand) *DTOs.Result[bool] {
+func (handler *CreateUserCommandHandler) Handle(command *CreateUserCommand) *dtos.Result[bool] {
 
 	//validation
 
@@ -41,7 +41,7 @@ func (handler *CreateCommandHandler) Handle(command *CreateCommand) *DTOs.Result
 
 	//endValidation
 
-	newUser := Entities.NewUser(handler.idGenerator,
+	newUser := entities.NewUser(handler.idGenerator,
 		command.FirstName, command.LastName, command.Username, command.Password,
 		command.EMail, command.CreatedBy, command.CreatedRole,
 	)
@@ -67,8 +67,8 @@ func (handler *CreateCommandHandler) Handle(command *CreateCommand) *DTOs.Result
 func NewCreateCommandHandler(
 	unitOfWork CommonInterface.IUnitOfWork,
 	idGenerator CommonInterface.IIdentityGenerator,
-) *CreateCommandHandler {
-	return &CreateCommandHandler{
+) *CreateUserCommandHandler {
+	return &CreateUserCommandHandler{
 		unitOfWork:  unitOfWork,
 		idGenerator: idGenerator,
 	}
@@ -76,12 +76,12 @@ func NewCreateCommandHandler(
 
 /*-------------------------------------------------------------------*/
 
-func _commandValidation(command *CreateCommand, repository UserInterface.IUserRepository) *DTOs.Result[bool] {
+func _commandValidation(command *CreateUserCommand, repository UserInterface.IUserRepository) *dtos.Result[bool] {
 
 	targetUser := repository.IsExistByUsername(command.Username)
 
 	if !targetUser.Result {
-		return &DTOs.Result[bool]{
+		return &dtos.Result[bool]{
 			Errors: []error{errors.New("نام کاربری قبلا انتخاب شده است")},
 			Result: false,
 		}
@@ -90,7 +90,7 @@ func _commandValidation(command *CreateCommand, repository UserInterface.IUserRe
 	targetUser = repository.IsExistByPhoneNumber(command.PhoneNumber)
 
 	if !targetUser.Result {
-		return &DTOs.Result[bool]{
+		return &dtos.Result[bool]{
 			Errors: []error{errors.New("شماره تماس قبلا انتخاب شده است")},
 			Result: false,
 		}
@@ -99,13 +99,13 @@ func _commandValidation(command *CreateCommand, repository UserInterface.IUserRe
 	targetUser = repository.IsExistByEmail(command.EMail)
 
 	if !targetUser.Result {
-		return &DTOs.Result[bool]{
+		return &dtos.Result[bool]{
 			Errors: []error{errors.New("پست الکترونیکی قبلا انتخاب شده است")},
 			Result: false,
 		}
 	}
 
-	return &DTOs.Result[bool]{
+	return &dtos.Result[bool]{
 		Errors: []error{},
 		Result: true,
 	}

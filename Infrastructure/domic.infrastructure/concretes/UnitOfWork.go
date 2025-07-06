@@ -1,9 +1,9 @@
-package Concrete
+package concretes
 
 import (
-	CommonInterface "domic.domain/Commons/Contracts/Interfaces"
-	"domic.domain/Commons/DTOs"
-	"domic.domain/User/Contracts/Interfaces"
+	CommonInterface "domic.domain/commons/contracts/interfaces"
+	"domic.domain/commons/dtos"
+	"domic.domain/user/contracts/contracts"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
@@ -13,51 +13,51 @@ type UnitOfWork struct {
 	tx *gorm.DB
 }
 
-func (unitOfWork *UnitOfWork) StartTransaction() *DTOs.Result[bool] {
+func (unitOfWork *UnitOfWork) StartTransaction() *dtos.Result[bool] {
 
 	unitOfWork.tx = unitOfWork.db.Begin()
 
 	if unitOfWork.tx.Error != nil {
-		return &DTOs.Result[bool]{
+		return &dtos.Result[bool]{
 			Result: false,
 			Errors: []error{unitOfWork.tx.Error},
 		}
 	}
 
-	return &DTOs.Result[bool]{Result: true}
+	return &dtos.Result[bool]{Result: true}
 }
 
-func (unitOfWork *UnitOfWork) Commit() *DTOs.Result[bool] {
+func (unitOfWork *UnitOfWork) Commit() *dtos.Result[bool] {
 
 	commitResult := unitOfWork.tx.Commit()
 
 	if commitResult.Error != nil {
-		return &DTOs.Result[bool]{
+		return &dtos.Result[bool]{
 			Result: false,
 			Errors: []error{commitResult.Error},
 		}
 	}
 
-	return &DTOs.Result[bool]{Result: true}
+	return &dtos.Result[bool]{Result: true}
 
 }
 
-func (unitOfWork *UnitOfWork) RollBack() *DTOs.Result[bool] {
+func (unitOfWork *UnitOfWork) RollBack() *dtos.Result[bool] {
 
 	rollBackResult := unitOfWork.tx.Rollback()
 
 	if rollBackResult.Error != nil {
-		return &DTOs.Result[bool]{
+		return &dtos.Result[bool]{
 			Result: false,
 			Errors: []error{rollBackResult.Error},
 		}
 	}
 
-	return &DTOs.Result[bool]{Result: true}
+	return &dtos.Result[bool]{Result: true}
 
 }
 
-func (unitOfWork *UnitOfWork) UserRepository() Interfaces.IUserRepository {
+func (unitOfWork *UnitOfWork) UserRepository() contracts.IUserRepository {
 
 	if unitOfWork.tx == nil {
 		return NewUserRepository(unitOfWork.db)

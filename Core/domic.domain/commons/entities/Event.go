@@ -1,7 +1,7 @@
-package Entities
+package entities
 
 import (
-	"domic.domain/Commons/Contracts/Interfaces"
+	"domic.domain/commons/contracts/interfaces"
 	"time"
 )
 
@@ -56,7 +56,7 @@ func (e *Event) GetIsActive() bool {
 	return e.isActive
 }
 
-func NewEvent(idGenerator Interfaces.IIdentityGenerator, name string, service string, table string, action string,
+func NewEvent(idGenerator interfaces.IIdentityGenerator, name string, service string, table string, action string,
 	payload string, createdAt time.Time,
 ) *Event {
 

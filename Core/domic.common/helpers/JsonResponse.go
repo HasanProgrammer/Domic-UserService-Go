@@ -1,4 +1,4 @@
-package Helpers
+package helpers
 
 type JsonBody struct{}
 

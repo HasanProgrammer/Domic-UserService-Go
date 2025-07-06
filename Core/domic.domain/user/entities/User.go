@@ -1,13 +1,13 @@
-package Entities
+package entities
 
 import (
-	"domic.domain/Commons/Contracts/Interfaces"
-	"domic.domain/Commons/Entities"
+	"domic.domain/commons/contracts/interfaces"
+	"domic.domain/commons/entities"
 	"time"
 )
 
 type User struct {
-	Entities.BaseEntity
+	entities.BaseEntity
 
 	firstName string
 	lastName  string
@@ -16,7 +16,7 @@ type User struct {
 	email     string
 }
 
-func NewUser(idGenerator Interfaces.IIdentityGenerator, firstName string, lastName string,
+func NewUser(idGenerator interfaces.IIdentityGenerator, firstName string, lastName string,
 	username string, password string, email string, createdBy string, createdRole string,
 ) *User {
 
@@ -38,7 +38,7 @@ func NewUser(idGenerator Interfaces.IIdentityGenerator, firstName string, lastNa
 
 	//producing event
 
-	user.BaseEntity.AppendEvent(Entities.NewEvent(idGenerator, "UserCreated", "UserService", "User", "CREATE", "", nowTime))
+	user.BaseEntity.AppendEvent(entities.NewEvent(idGenerator, "UserCreated", "UserService", "user", "CREATE", "", nowTime))
 
 	return user
 }
@@ -68,7 +68,7 @@ func Assemble(id string, firstName string, lastName string,
 
 }
 
-func (user *User) GetEvents() []*Entities.Event {
+func (user *User) GetEvents() []*entities.Event {
 	return user.BaseEntity.Events()
 }
 

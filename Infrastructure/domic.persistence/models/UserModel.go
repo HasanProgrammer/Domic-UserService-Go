@@ -1,12 +1,11 @@
-package Models
+package models
 
 import (
-	"domic.domain/User/Entities"
-	persistence "domic.persistence"
+	"domic.domain/user/entities"
 )
 
 type UserModel struct {
-	persistence.BaseModel
+	BaseModel
 
 	FirstName string `gorm:"column:FirstName;type:varchar(80); not null"`
 	LastName  string `gorm:"column:LastName;type:varchar(100); not null"`
@@ -15,7 +14,7 @@ type UserModel struct {
 	Email     string `gorm:"column:Email;not null"`
 }
 
-func ConvertUserEntityToModel(user *Entities.User) *UserModel {
+func ConvertUserEntityToModel(user *entities.User) *UserModel {
 	model := &UserModel{}
 
 	model.FirstName = user.GetFirstName()
@@ -35,7 +34,7 @@ func ConvertUserEntityToModel(user *Entities.User) *UserModel {
 	return model
 }
 
-func ConvertUserEntitiesToModels(users []*Entities.User) []*UserModel {
+func ConvertUserEntitiesToModels(users []*entities.User) []*UserModel {
 
 	var models []*UserModel
 
@@ -65,19 +64,19 @@ func ConvertUserEntitiesToModels(users []*Entities.User) []*UserModel {
 
 }
 
-func ConvertUserModelToEntity(model *UserModel) *Entities.User {
-	return Entities.Assemble(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
+func ConvertUserModelToEntity(model *UserModel) *entities.User {
+	return entities.Assemble(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
 		model.Email, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole, model.UpdatedAt,
 	)
 }
 
-func ConvertUserModelsToEntities(models []UserModel) []*Entities.User {
+func ConvertUserModelsToEntities(models []UserModel) []*entities.User {
 
-	var users []*Entities.User
+	var users []*entities.User
 
 	for _, model := range models {
 
-		userEntity := Entities.Assemble(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
+		userEntity := entities.Assemble(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
 			model.Email, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole,
 			model.UpdatedAt,
 		)

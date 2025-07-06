@@ -1,4 +1,4 @@
-package DTOs
+package dtos
 
 type PaginationRequest struct {
 	PageSize  int
