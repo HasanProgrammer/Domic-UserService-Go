@@ -3,7 +3,7 @@ package Interfaces
 import (
 	"domic.domain/Commons/Contracts/Interfaces"
 	"domic.domain/Commons/DTOs"
-	"domic.domain/User/Entities"
+	"domic.domain/user/Entities"
 )
 
 type IUserRepository interface {

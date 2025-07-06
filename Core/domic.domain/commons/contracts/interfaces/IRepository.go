@@ -1,7 +1,7 @@
-package Interfaces
+package contracts
 
 import (
-	"domic.domain/Commons/DTOs"
+	"domic.domain/commons/DTOs"
 )
 
 type IRepository[TIdentity any, TEntity any] interface {

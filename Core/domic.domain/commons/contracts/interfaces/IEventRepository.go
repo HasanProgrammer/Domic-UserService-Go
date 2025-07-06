@@ -1,7 +1,7 @@
-package Interfaces
+package contracts
 
 import (
-	"domic.domain/Commons/Entities"
+	"domic.domain/commons/Entities"
 )
 
 type IEventRepository interface {

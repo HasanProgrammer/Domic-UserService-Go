@@ -33,7 +33,7 @@ func (handler *CreateCommandHandler) Handle(command *CreateCommand) *DTOs.Result
 
 	//validation
 
-	validateResult := commandValidation(command, handler.unitOfWork.UserRepository())
+	validateResult := _commandValidation(command, handler.unitOfWork.UserRepository())
 
 	if !validateResult.Result {
 		return validateResult
@@ -76,7 +76,7 @@ func NewCreateCommandHandler(
 
 /*-------------------------------------------------------------------*/
 
-func commandValidation(command *CreateCommand, repository UserInterface.IUserRepository) *DTOs.Result[bool] {
+func _commandValidation(command *CreateCommand, repository UserInterface.IUserRepository) *DTOs.Result[bool] {
 
 	targetUser := repository.IsExistByUsername(command.Username)
 
