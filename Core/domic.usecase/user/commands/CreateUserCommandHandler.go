@@ -64,7 +64,7 @@ func (handler *CreateUserCommandHandler) Handle(command *CreateUserCommand) *dto
 	return commitResult
 }
 
-func NewCreateCommandHandler(
+func NewCreateUserCommandHandler(
 	unitOfWork CommonInterface.IUnitOfWork,
 	idGenerator CommonInterface.IIdentityGenerator,
 ) *CreateUserCommandHandler {

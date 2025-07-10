@@ -2,14 +2,20 @@ package endpoints
 
 import (
 	"context"
+	"domic.domain/commons/contracts/interfaces"
+	"domic.usecase/user/commands"
 	userRpc "github.com/HasanProgrammer/Domic-GrpcService-Go/UserService/compile/service"
 )
 
 type UserServer struct {
 	userRpc.UnimplementedUserServiceServer
+
+	UnitOfWork  interfaces.IUnitOfWork
+	IdGenerator interfaces.IIdentityGenerator
 }
 
 func (server *UserServer) CheckExist(ctx context.Context, req *userRpc.CheckExistRequest) (*userRpc.CheckExistResponse, error) {
+
 	return nil, nil
 }
 
@@ -26,6 +32,13 @@ func (server *UserServer) Create(ctx context.Context, req *userRpc.CreateRequest
 }
 
 func (server *UserServer) Update(ctx context.Context, req *userRpc.UpdateRequest) (*userRpc.UpdateResponse, error) {
+
+	command := commands.CreateUserCommand{
+		FirstName: req.FirstName.GetValue(),
+	}
+
+	result := commands.NewCreateUserCommandHandler()
+
 	return nil, nil
 }
 

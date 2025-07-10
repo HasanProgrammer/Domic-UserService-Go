@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Domic.Infrastructure/concretes"
 	"domic.webapi/endpoints"
 	userRpc "github.com/HasanProgrammer/Domic-GrpcService-Go/UserService/compile/service"
 	"google.golang.org/grpc"
@@ -16,9 +17,15 @@ func main() {
 		log.Fatal("failed to listen:", err)
 	}
 
+	//dependencies
+
+	unitOfWork, err := concretes.NewUnitOfWork("")
+
 	server := grpc.NewServer()
 
-	userRpc.RegisterUserServiceServer(server, &endpoints.UserServer{})
+	userRpc.RegisterUserServiceServer(server, &endpoints.UserServer{
+		UnitOfWork: unitOfWork,
+	})
 
 	log.Println("gRPC server listening on :1996")
 
