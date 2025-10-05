@@ -232,7 +232,7 @@ func (repository *UserRepository) IsExistById(id string, context context.Context
 
 	var model *models.UserModel
 
-	queryResult := repository.db.First(model, "Id = ?", id).WithContext(context)
+	queryResult := repository.db.First(model, "GetId = ?", id).WithContext(context)
 
 	if queryResult.Error != nil || model == nil {
 		return &dtos.Result[bool]{

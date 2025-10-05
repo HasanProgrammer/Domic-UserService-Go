@@ -15,6 +15,9 @@ type UserModel struct {
 	PhoneNumber string `gorm:"column:PhoneNumber;not null"`
 	Description string `gorm:"column:Description;not null"`
 	ImageUrl    string `gorm:"column:Description;not null"`
+
+	//relations
+	RoleUsers []RoleUserModel `gorm:"foreignKey:UserId"`
 }
 
 func ConvertUserEntityToModel(user *entities.User) *UserModel {

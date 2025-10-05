@@ -3,12 +3,12 @@ package models
 import "time"
 
 type BaseModel struct {
-	Id          string     `gorm:"primaryKey;column:Id"`
-	CreatedAt   time.Time  `gorm:"column:CreatedAt"`
-	CreatedBy   string     `gorm:"column:CreatedBy"`
-	CreatedRole string     `gorm:"column:CreatedRole"`
-	UpdatedAt   *time.Time `gorm:"column:UpdatedAt"`
-	UpdatedBy   *string    `gorm:"column:UpdatedBy"`
-	UpdatedRole *string    `gorm:"column:UpdatedRole"`
-	IsActive    bool       `gorm:"column:IsActive"`
+	Id          string     `gorm:"primaryKey;column:GetId"`
+	CreatedAt   time.Time  `gorm:"column:GetCreatedAt"`
+	CreatedBy   string     `gorm:"column:GetCreatedBy"`
+	CreatedRole string     `gorm:"column:GetCreatedRole"`
+	UpdatedAt   *time.Time `gorm:"column:GetUpdatedAt"`
+	UpdatedBy   *string    `gorm:"column:GetUpdatedBy"`
+	UpdatedRole *string    `gorm:"column:GetUpdatedRole"`
+	IsActive    bool       `gorm:"column:GetIsActive"`
 }

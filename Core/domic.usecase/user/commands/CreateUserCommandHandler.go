@@ -4,6 +4,7 @@ import (
 	"context"
 	CommonInterface "domic.domain/commons/contracts/interfaces"
 	"domic.domain/commons/dtos"
+	RoleUser "domic.domain/role_user/entities"
 	UserInterface "domic.domain/user/contracts/contracts"
 	"domic.domain/user/entities"
 	"errors"
@@ -56,6 +57,16 @@ func (handler *CreateUserCommandHandler) Handle(command *CreateUserCommand, ctx 
 
 	handler.unitOfWork.EventRepository().AddRange(newUser.GetEvents(), ctx)
 	handler.unitOfWork.UserRepository().Add(newUser, ctx)
+
+	var roleUsers []*RoleUser.RoleUser
+
+	for _, role := range command.Roles {
+		roleUsers = append(roleUsers,
+			RoleUser.NewRoleUser(handler.idGenerator, role, newUser.GetId(), command.CreatedBy, command.CreatedRole),
+		)
+	}
+
+	handler.unitOfWork.RoleUserRepository().AddRange(roleUsers, ctx)
 
 	commitResult := handler.unitOfWork.Commit(ctx)
 

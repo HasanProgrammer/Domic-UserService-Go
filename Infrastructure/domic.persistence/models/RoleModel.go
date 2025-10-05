@@ -8,6 +8,9 @@ type RoleModel struct {
 	BaseModel
 
 	Name string `gorm:"column:Name;type:varchar(80); not null"`
+
+	//relations
+	RoleUsers []RoleUserModel `gorm:"foreignKey:RoleId"`
 }
 
 func ConvertRoleEntityToModel(role *entities.Role) *RoleModel {

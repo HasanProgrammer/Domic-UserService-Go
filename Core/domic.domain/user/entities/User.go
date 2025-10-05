@@ -79,14 +79,6 @@ func Assemble(id string, firstName string, lastName string,
 
 }
 
-func (user *User) GetEvents() []*entities.Event {
-	return user.BaseEntity.Events()
-}
-
-func (user *User) GetId() string {
-	return user.BaseEntity.Id()
-}
-
 func (user *User) GetFirstName() string {
 	return user.firstName
 }
@@ -117,32 +109,4 @@ func (user *User) GetImageUrl() string {
 
 func (user *User) GetDescription() string {
 	return user.description
-}
-
-func (user *User) GetIsActive() bool {
-	return user.BaseEntity.IsActive()
-}
-
-func (user *User) GetCreatedAt() time.Time {
-	return user.BaseEntity.CreatedAt()
-}
-
-func (user *User) GetCreatedBy() string {
-	return user.BaseEntity.CreatedBy()
-}
-
-func (user *User) GetCreatedRole() string {
-	return user.BaseEntity.CreatedRole()
-}
-
-func (user *User) GetUpdatedAt() *time.Time {
-	return user.BaseEntity.UpdatedAt()
-}
-
-func (user *User) GetUpdatedBy() *string {
-	return user.BaseEntity.UpdatedBy()
-}
-
-func (user *User) GetUpdatedRole() *string {
-	return user.BaseEntity.UpdatedRole()
 }

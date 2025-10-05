@@ -9,6 +9,9 @@ type RoleUserModel struct {
 
 	RoleId string `gorm:"column:RoleId; not null"`
 	UserId string `gorm:"column:UserId; not null"`
+
+	User UserModel `gorm:"references:Id"`
+	Role RoleModel `gorm:"references:Id"`
 }
 
 func ConvertRoleUserEntityToModel(roleUser *entities.RoleUser) *RoleUserModel {

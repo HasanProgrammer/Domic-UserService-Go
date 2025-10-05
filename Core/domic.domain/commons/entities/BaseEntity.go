@@ -14,7 +14,7 @@ type BaseEntity struct {
 	updatedRole *string
 }
 
-func (b *BaseEntity) Events() []*Event {
+func (b *BaseEntity) GetEvents() []*Event {
 	return b.events
 }
 
@@ -22,7 +22,7 @@ func (b *BaseEntity) AppendEvent(event *Event) {
 	b.events = append(b.events, event)
 }
 
-func (b *BaseEntity) Id() string {
+func (b *BaseEntity) GetId() string {
 	return b.id
 }
 
@@ -30,7 +30,7 @@ func (b *BaseEntity) SetId(id string) {
 	b.id = id
 }
 
-func (b *BaseEntity) IsActive() bool {
+func (b *BaseEntity) GetIsActive() bool {
 	return b.isActive
 }
 
@@ -38,7 +38,7 @@ func (b *BaseEntity) SetIsActive(isActive bool) {
 	b.isActive = isActive
 }
 
-func (b *BaseEntity) CreatedAt() time.Time {
+func (b *BaseEntity) GetCreatedAt() time.Time {
 	return b.createdAt
 }
 
@@ -46,7 +46,7 @@ func (b *BaseEntity) SetCreatedAt(createdAt time.Time) {
 	b.createdAt = createdAt
 }
 
-func (b *BaseEntity) CreatedBy() string {
+func (b *BaseEntity) GetCreatedBy() string {
 	return b.createdBy
 }
 
@@ -54,7 +54,7 @@ func (b *BaseEntity) SetCreatedBy(createdBy string) {
 	b.createdBy = createdBy
 }
 
-func (b *BaseEntity) CreatedRole() string {
+func (b *BaseEntity) GetCreatedRole() string {
 	return b.createdRole
 }
 
@@ -62,7 +62,7 @@ func (b *BaseEntity) SetCreatedRole(createdRole string) {
 	b.createdRole = createdRole
 }
 
-func (b *BaseEntity) UpdatedAt() *time.Time {
+func (b *BaseEntity) GetUpdatedAt() *time.Time {
 	return b.updatedAt
 }
 
@@ -70,7 +70,7 @@ func (b *BaseEntity) SetUpdatedAt(updatedAt *time.Time) {
 	b.updatedAt = updatedAt
 }
 
-func (b *BaseEntity) UpdatedBy() *string {
+func (b *BaseEntity) GetUpdatedBy() *string {
 	return b.updatedBy
 }
 
@@ -78,7 +78,7 @@ func (b *BaseEntity) SetUpdatedBy(updatedBy *string) {
 	b.updatedBy = updatedBy
 }
 
-func (b *BaseEntity) UpdatedRole() *string {
+func (b *BaseEntity) GetUpdatedRole() *string {
 	return b.updatedRole
 }
 
