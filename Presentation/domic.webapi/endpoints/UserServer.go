@@ -37,10 +37,6 @@ func (server *UserServer) ReadAllPaginated(ctx context.Context, req *userRpc.Rea
 }
 
 func (server *UserServer) Create(ctx context.Context, req *userRpc.CreateRequest) (*userRpc.CreateResponse, error) {
-	return nil, nil
-}
-
-func (server *UserServer) Update(ctx context.Context, req *userRpc.UpdateRequest) (*userRpc.UpdateResponse, error) {
 
 	var roles []string
 
@@ -73,6 +69,12 @@ func (server *UserServer) Update(ctx context.Context, req *userRpc.UpdateRequest
 	handler := commands.NewCreateUserCommandHandler(server.UnitOfWork, server.IdGenerator)
 
 	handler.Handle(&command, ctx)
+
+	return nil, nil
+
+}
+
+func (server *UserServer) Update(ctx context.Context, req *userRpc.UpdateRequest) (*userRpc.UpdateResponse, error) {
 
 	return nil, nil
 

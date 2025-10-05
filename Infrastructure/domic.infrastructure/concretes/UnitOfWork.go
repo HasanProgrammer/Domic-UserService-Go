@@ -4,7 +4,8 @@ import (
 	"context"
 	CommonInterface "domic.domain/commons/contracts/interfaces"
 	"domic.domain/commons/dtos"
-	"domic.domain/user/contracts/contracts"
+	RoleContracts "domic.domain/role/contracts/contracts"
+	UserContracts "domic.domain/user/contracts/contracts"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
@@ -58,7 +59,17 @@ func (unitOfWork *UnitOfWork) RollBack(ctx context.Context) *dtos.Result[bool] {
 
 }
 
-func (unitOfWork *UnitOfWork) UserRepository() contracts.IUserRepository {
+func (unitOfWork *UnitOfWork) RoleRepository() RoleContracts.IRoleRepository {
+
+	if unitOfWork.tx == nil {
+		return NewRoleRepository(unitOfWork.db)
+	} else {
+		return NewRoleRepository(unitOfWork.tx)
+	}
+
+}
+
+func (unitOfWork *UnitOfWork) UserRepository() UserContracts.IUserRepository {
 
 	if unitOfWork.tx == nil {
 		return NewUserRepository(unitOfWork.db)

@@ -7,11 +7,14 @@ import (
 type UserModel struct {
 	BaseModel
 
-	FirstName string `gorm:"column:FirstName;type:varchar(80); not null"`
-	LastName  string `gorm:"column:LastName;type:varchar(100); not null"`
-	Username  string `gorm:"column:Username;type:varchar(20); not null"`
-	Password  string `gorm:"column:Password;not null"`
-	Email     string `gorm:"column:Email;not null"`
+	FirstName   string `gorm:"column:FirstName;type:varchar(80); not null"`
+	LastName    string `gorm:"column:LastName;type:varchar(100); not null"`
+	Username    string `gorm:"column:Username;type:varchar(20); not null"`
+	Password    string `gorm:"column:Password;not null"`
+	Email       string `gorm:"column:Email;not null"`
+	PhoneNumber string `gorm:"column:PhoneNumber;not null"`
+	Description string `gorm:"column:Description;not null"`
+	ImageUrl    string `gorm:"column:Description;not null"`
 }
 
 func ConvertUserEntityToModel(user *entities.User) *UserModel {
@@ -22,6 +25,9 @@ func ConvertUserEntityToModel(user *entities.User) *UserModel {
 	model.Username = user.GetUsername()
 	model.Password = user.GetPassword()
 	model.Email = user.GetEmail()
+	model.PhoneNumber = user.GetPhoneNumber()
+	model.Description = user.GetDescription()
+	model.ImageUrl = user.GetImageUrl()
 	model.BaseModel.Id = user.GetId()
 	model.BaseModel.CreatedBy = user.GetCreatedBy()
 	model.BaseModel.CreatedAt = user.GetCreatedAt()
@@ -47,6 +53,9 @@ func ConvertUserEntitiesToModels(users []*entities.User) []*UserModel {
 		model.Username = user.GetUsername()
 		model.Password = user.GetPassword()
 		model.Email = user.GetEmail()
+		model.PhoneNumber = user.GetPhoneNumber()
+		model.Description = user.GetDescription()
+		model.ImageUrl = user.GetImageUrl()
 		model.BaseModel.Id = user.GetId()
 		model.BaseModel.CreatedBy = user.GetCreatedBy()
 		model.BaseModel.CreatedAt = user.GetCreatedAt()
@@ -66,7 +75,7 @@ func ConvertUserEntitiesToModels(users []*entities.User) []*UserModel {
 
 func ConvertUserModelToEntity(model *UserModel) *entities.User {
 	return entities.Assemble(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
-		model.Email, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole, model.UpdatedAt,
+		model.Email, model.PhoneNumber, model.ImageUrl, model.Description, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole, model.UpdatedAt,
 	)
 }
 
@@ -77,8 +86,8 @@ func ConvertUserModelsToEntities(models []UserModel) []*entities.User {
 	for _, model := range models {
 
 		userEntity := entities.Assemble(model.Id, model.FirstName, model.LastName, model.Username, model.Password,
-			model.Email, model.CreatedBy, model.CreatedRole, model.CreatedAt, model.UpdatedBy, model.UpdatedRole,
-			model.UpdatedAt,
+			model.Email, model.PhoneNumber, model.ImageUrl, model.Description, model.CreatedBy, model.CreatedRole,
+			model.CreatedAt, model.UpdatedBy, model.UpdatedRole, model.UpdatedAt,
 		)
 
 		users = append(users, userEntity)

@@ -3,24 +3,18 @@ package concretes
 import (
 	"context"
 	"domic.domain/commons/dtos"
-	"domic.domain/user/entities"
+	"domic.domain/role/entities"
 	"domic.persistence/models"
 	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type RoleRepository struct {
 	db *gorm.DB
 }
 
-func (repository *UserRepository) Add(entity *entities.User, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) Add(entity *entities.Role, context context.Context) *dtos.Result[bool] {
 
-	select {
-	case <-context.Done():
-		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
-	default:
-	}
-
-	dataModel := models.ConvertUserEntityToModel(entity)
+	dataModel := models.ConvertRoleEntityToModel(entity)
 
 	queryResult := repository.db.Model(&models.UserModel{}).Create(dataModel).WithContext(context)
 
@@ -37,15 +31,9 @@ func (repository *UserRepository) Add(entity *entities.User, context context.Con
 
 }
 
-func (repository *UserRepository) AddRange(entities []*entities.User, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) AddRange(entities []*entities.Role, context context.Context) *dtos.Result[bool] {
 
-	select {
-	case <-context.Done():
-		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
-	default:
-	}
-
-	dataModels := models.ConvertUserEntitiesToModels(entities)
+	dataModels := models.ConvertRoleEntitiesToModels(entities)
 
 	queryResult := repository.db.Model(&models.UserModel{}).CreateInBatches(dataModels, len(entities)).WithContext(context)
 
@@ -62,15 +50,9 @@ func (repository *UserRepository) AddRange(entities []*entities.User, context co
 
 }
 
-func (repository *UserRepository) Change(entity *entities.User, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) Change(entity *entities.Role, context context.Context) *dtos.Result[bool] {
 
-	select {
-	case <-context.Done():
-		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
-	default:
-	}
-
-	dataModel := models.ConvertUserEntityToModel(entity)
+	dataModel := models.ConvertRoleEntityToModel(entity)
 
 	queryResult := repository.db.Model(&models.UserModel{}).Updates(dataModel).WithContext(context)
 
@@ -87,17 +69,11 @@ func (repository *UserRepository) Change(entity *entities.User, context context.
 
 }
 
-func (repository *UserRepository) ChangeRange(entities []*entities.User, context context.Context) *dtos.Result[bool] {
-
-	select {
-	case <-context.Done():
-		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
-	default:
-	}
+func (repository *RoleRepository) ChangeRange(entities []*entities.Role, context context.Context) *dtos.Result[bool] {
 
 	var errors []error
 
-	for model := range models.ConvertUserEntitiesToModels(entities) {
+	for model := range models.ConvertRoleEntitiesToModels(entities) {
 
 		queryResult := repository.db.Model(&models.UserModel{}).Updates(model).WithContext(context)
 
@@ -118,15 +94,9 @@ func (repository *UserRepository) ChangeRange(entities []*entities.User, context
 
 }
 
-func (repository *UserRepository) Remove(entity *entities.User, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) Remove(entity *entities.Role, context context.Context) *dtos.Result[bool] {
 
-	select {
-	case <-context.Done():
-		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
-	default:
-	}
-
-	dataModel := models.ConvertUserEntityToModel(entity)
+	dataModel := models.ConvertRoleEntityToModel(entity)
 
 	queryResult := repository.db.Model(&models.UserModel{}).Delete(dataModel, dataModel.Id).WithContext(context)
 
@@ -141,11 +111,11 @@ func (repository *UserRepository) Remove(entity *entities.User, context context.
 
 }
 
-func (repository *UserRepository) RemoveRange(entities []*entities.User, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) RemoveRange(entities []*entities.Role, context context.Context) *dtos.Result[bool] {
 
 	var errors []error
 
-	for _, model := range models.ConvertUserEntitiesToModels(entities) {
+	for _, model := range models.ConvertRoleEntitiesToModels(entities) {
 
 		queryResult := repository.db.Model(&models.UserModel{}).Delete(model, model.Id).WithContext(context)
 
@@ -168,37 +138,37 @@ func (repository *UserRepository) RemoveRange(entities []*entities.User, context
 
 }
 
-func (repository *UserRepository) FindById(id string, context context.Context) *dtos.Result[*entities.User] {
+func (repository *RoleRepository) FindById(id string, context context.Context) *dtos.Result[*entities.Role] {
 
-	var model *models.UserModel
+	var model *models.RoleModel
 
 	queryResult := repository.db.First(model, "id = ?", id).WithContext(context)
 
 	if queryResult.Error != nil {
-		return &dtos.Result[*entities.User]{
+		return &dtos.Result[*entities.Role]{
 			Result: nil,
 			Errors: []error{queryResult.Error},
 		}
 	}
 
-	return &dtos.Result[*entities.User]{
-		Result: models.ConvertUserModelToEntity(model),
+	return &dtos.Result[*entities.Role]{
+		Result: models.ConvertRoleModelToEntity(model),
 	}
 
 }
 
-func (repository *UserRepository) FindAll(paginationRequest *dtos.PaginationRequest, context context.Context) *dtos.Result[*dtos.PaginationResponse[*entities.User]] {
+func (repository *RoleRepository) FindAll(paginationRequest *dtos.PaginationRequest, context context.Context) *dtos.Result[*dtos.PaginationResponse[*entities.Role]] {
 
 	offset := (paginationRequest.PageIndex - 1) * paginationRequest.PageSize
 
 	var total int64
 
-	var dataModels []models.UserModel
+	var dataModels []models.RoleModel
 
 	countOfItem := repository.db.Model(&models.UserModel{}).Count(&total).WithContext(context)
 
 	if countOfItem.Error != nil {
-		return &dtos.Result[*dtos.PaginationResponse[*entities.User]]{
+		return &dtos.Result[*dtos.PaginationResponse[*entities.Role]]{
 			Result: nil,
 			Errors: []error{countOfItem.Error},
 		}
@@ -209,17 +179,17 @@ func (repository *UserRepository) FindAll(paginationRequest *dtos.PaginationRequ
 	queryResult := repository.db.Model(&models.UserModel{}).Limit(paginationRequest.PageSize).Offset(offset).Find(&dataModels).WithContext(context)
 
 	if queryResult.Error != nil {
-		return &dtos.Result[*dtos.PaginationResponse[*entities.User]]{
+		return &dtos.Result[*dtos.PaginationResponse[*entities.Role]]{
 			Result: nil,
 			Errors: []error{queryResult.Error},
 		}
 	}
 
-	return &dtos.Result[*dtos.PaginationResponse[*entities.User]]{
-		Result: &dtos.PaginationResponse[*entities.User]{
+	return &dtos.Result[*dtos.PaginationResponse[*entities.Role]]{
+		Result: &dtos.PaginationResponse[*entities.Role]{
 			PageSize:  paginationRequest.PageSize,
 			PageIndex: paginationRequest.PageIndex,
-			Items:     models.ConvertUserModelsToEntities(dataModels),
+			Items:     models.ConvertRoleModelsToEntities(dataModels),
 			TotalItem: total,
 			HasNext:   paginationRequest.PageIndex < totalPages,
 			HasPrev:   paginationRequest.PageIndex > 1,
@@ -228,7 +198,7 @@ func (repository *UserRepository) FindAll(paginationRequest *dtos.PaginationRequ
 
 }
 
-func (repository *UserRepository) IsExistById(id string, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) IsExistById(id string, context context.Context) *dtos.Result[bool] {
 
 	var model *models.UserModel
 
@@ -245,7 +215,7 @@ func (repository *UserRepository) IsExistById(id string, context context.Context
 
 }
 
-func (repository *UserRepository) IsExistByUsername(username string, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) IsExistByUsername(username string, context context.Context) *dtos.Result[bool] {
 
 	var model *models.UserModel
 
@@ -262,7 +232,7 @@ func (repository *UserRepository) IsExistByUsername(username string, context con
 
 }
 
-func (repository *UserRepository) IsExistByPhoneNumber(phoneNumber string, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) IsExistByPhoneNumber(phoneNumber string, context context.Context) *dtos.Result[bool] {
 
 	var model *models.UserModel
 
@@ -279,7 +249,7 @@ func (repository *UserRepository) IsExistByPhoneNumber(phoneNumber string, conte
 
 }
 
-func (repository *UserRepository) IsExistByEmail(email string, context context.Context) *dtos.Result[bool] {
+func (repository *RoleRepository) IsExistByEmail(email string, context context.Context) *dtos.Result[bool] {
 
 	var model *models.UserModel
 
@@ -296,6 +266,6 @@ func (repository *UserRepository) IsExistByEmail(email string, context context.C
 
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	return &UserRepository{db: db}
+func NewRoleRepository(db *gorm.DB) *RoleRepository {
+	return &RoleRepository{db: db}
 }

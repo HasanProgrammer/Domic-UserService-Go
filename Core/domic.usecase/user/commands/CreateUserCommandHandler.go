@@ -64,6 +64,7 @@ func (handler *CreateUserCommandHandler) Handle(command *CreateUserCommand, ctx 
 	}
 
 	return commitResult
+
 }
 
 func NewCreateUserCommandHandler(

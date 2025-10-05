@@ -3,7 +3,9 @@ package interfaces
 import (
 	"context"
 	"domic.domain/commons/dtos"
-	"domic.domain/user/contracts/contracts"
+	RoleContracts "domic.domain/role/contracts/contracts"
+	RoleUserContracts "domic.domain/role_user/contracts/contracts"
+	UserContarcts "domic.domain/user/contracts/contracts"
 )
 
 type IUnitOfWork interface {
@@ -11,6 +13,8 @@ type IUnitOfWork interface {
 	Commit(ctx context.Context) *dtos.Result[bool]
 	RollBack(ctx context.Context) *dtos.Result[bool]
 
-	UserRepository() contracts.IUserRepository
+	RoleUserRepository() RoleUserContracts.IRoleUserRepository
+	UserRepository() UserContarcts.IUserRepository
+	RoleRepository() RoleContracts.IRoleRepository
 	EventRepository() IEventRepository
 }
