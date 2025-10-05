@@ -9,15 +9,19 @@ import (
 type User struct {
 	entities.BaseEntity
 
-	firstName string
-	lastName  string
-	username  string
-	password  string
-	email     string
+	firstName   string
+	lastName    string
+	username    string
+	password    string
+	email       string
+	phoneNumber string
+	imageUrl    string
+	description string
 }
 
 func NewUser(idGenerator interfaces.IIdentityGenerator, firstName string, lastName string,
-	username string, password string, email string, createdBy string, createdRole string,
+	username string, password string, email string, phoneNumber string, imageUrl string, description string,
+	createdBy string, createdRole string,
 ) *User {
 
 	id := idGenerator.GetRandom(4)
@@ -35,6 +39,9 @@ func NewUser(idGenerator interfaces.IIdentityGenerator, firstName string, lastNa
 	user.username = username
 	user.password = password
 	user.email = email
+	user.phoneNumber = phoneNumber
+	user.imageUrl = imageUrl
+	user.description = description
 
 	//producing event
 
@@ -44,7 +51,8 @@ func NewUser(idGenerator interfaces.IIdentityGenerator, firstName string, lastNa
 }
 
 func Assemble(id string, firstName string, lastName string,
-	username string, password string, email string, createdBy string, createdRole string, createdAt time.Time,
+	username string, password string, email string, phoneNumber string, imageUrl string, description string,
+	createdBy string, createdRole string, createdAt time.Time,
 	updatedBy *string, updatedRole *string, updatedAt *time.Time,
 ) *User {
 
@@ -63,6 +71,9 @@ func Assemble(id string, firstName string, lastName string,
 	user.username = username
 	user.password = password
 	user.email = email
+	user.phoneNumber = phoneNumber
+	user.imageUrl = imageUrl
+	user.description = description
 
 	return user
 
@@ -94,6 +105,18 @@ func (user *User) GetPassword() string {
 
 func (user *User) GetEmail() string {
 	return user.email
+}
+
+func (user *User) GetPhoneNumber() string {
+	return user.phoneNumber
+}
+
+func (user *User) GetImageUrl() string {
+	return user.imageUrl
+}
+
+func (user *User) GetDescription() string {
+	return user.description
 }
 
 func (user *User) GetIsActive() bool {

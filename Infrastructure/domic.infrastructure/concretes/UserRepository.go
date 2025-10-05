@@ -1,6 +1,7 @@
 package concretes
 
 import (
+	"context"
 	"domic.domain/commons/dtos"
 	"domic.domain/user/entities"
 	"domic.persistence/models"
@@ -11,7 +12,13 @@ type UserRepository struct {
 	db *gorm.DB
 }
 
-func (repository *UserRepository) Add(entity *entities.User) *dtos.Result[bool] {
+func (repository *UserRepository) Add(entity *entities.User, context context.Context) *dtos.Result[bool] {
+
+	select {
+	case <-context.Done():
+		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
+	default:
+	}
 
 	dataModel := models.ConvertUserEntityToModel(entity)
 
@@ -30,7 +37,13 @@ func (repository *UserRepository) Add(entity *entities.User) *dtos.Result[bool] 
 
 }
 
-func (repository *UserRepository) AddRange(entities []*entities.User) *dtos.Result[bool] {
+func (repository *UserRepository) AddRange(entities []*entities.User, context context.Context) *dtos.Result[bool] {
+
+	select {
+	case <-context.Done():
+		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
+	default:
+	}
 
 	dataModels := models.ConvertUserEntitiesToModels(entities)
 
@@ -49,7 +62,13 @@ func (repository *UserRepository) AddRange(entities []*entities.User) *dtos.Resu
 
 }
 
-func (repository *UserRepository) Change(entity *entities.User) *dtos.Result[bool] {
+func (repository *UserRepository) Change(entity *entities.User, context context.Context) *dtos.Result[bool] {
+
+	select {
+	case <-context.Done():
+		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
+	default:
+	}
 
 	dataModel := models.ConvertUserEntityToModel(entity)
 
@@ -68,7 +87,13 @@ func (repository *UserRepository) Change(entity *entities.User) *dtos.Result[boo
 
 }
 
-func (repository *UserRepository) ChangeRange(entities []*entities.User) *dtos.Result[bool] {
+func (repository *UserRepository) ChangeRange(entities []*entities.User, context context.Context) *dtos.Result[bool] {
+
+	select {
+	case <-context.Done():
+		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
+	default:
+	}
 
 	var errors []error
 
@@ -93,7 +118,13 @@ func (repository *UserRepository) ChangeRange(entities []*entities.User) *dtos.R
 
 }
 
-func (repository *UserRepository) Remove(entity *entities.User) *dtos.Result[bool] {
+func (repository *UserRepository) Remove(entity *entities.User, context context.Context) *dtos.Result[bool] {
+
+	select {
+	case <-context.Done():
+		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
+	default:
+	}
 
 	dataModel := models.ConvertUserEntityToModel(entity)
 
@@ -110,13 +141,13 @@ func (repository *UserRepository) Remove(entity *entities.User) *dtos.Result[boo
 
 }
 
-func (repository *UserRepository) RemoveRange(entities []*entities.User) *dtos.Result[bool] {
+func (repository *UserRepository) RemoveRange(entities []*entities.User, context context.Context) *dtos.Result[bool] {
 
 	var errors []error
 
 	for _, model := range models.ConvertUserEntitiesToModels(entities) {
 
-		queryResult := repository.db.Model(&models.UserModel{}).Delete(model, model.Id)
+		queryResult := repository.db.Model(&models.UserModel{}).Delete(model, model.Id).WithContext(context)
 
 		if queryResult.Error != nil {
 			errors = append(errors, queryResult.Error)
@@ -137,11 +168,11 @@ func (repository *UserRepository) RemoveRange(entities []*entities.User) *dtos.R
 
 }
 
-func (repository *UserRepository) FindById(id string) *dtos.Result[*entities.User] {
+func (repository *UserRepository) FindById(id string, context context.Context) *dtos.Result[*entities.User] {
 
 	var model *models.UserModel
 
-	queryResult := repository.db.First(model, "id = ?", id)
+	queryResult := repository.db.First(model, "id = ?", id).WithContext(context)
 
 	if queryResult.Error != nil {
 		return &dtos.Result[*entities.User]{
@@ -156,7 +187,7 @@ func (repository *UserRepository) FindById(id string) *dtos.Result[*entities.Use
 
 }
 
-func (repository *UserRepository) FindAll(paginationRequest *dtos.PaginationRequest) *dtos.Result[*dtos.PaginationResponse[*entities.User]] {
+func (repository *UserRepository) FindAll(paginationRequest *dtos.PaginationRequest, context context.Context) *dtos.Result[*dtos.PaginationResponse[*entities.User]] {
 
 	offset := (paginationRequest.PageIndex - 1) * paginationRequest.PageSize
 
@@ -164,7 +195,7 @@ func (repository *UserRepository) FindAll(paginationRequest *dtos.PaginationRequ
 
 	var dataModels []models.UserModel
 
-	countOfItem := repository.db.Model(&models.UserModel{}).Count(&total)
+	countOfItem := repository.db.Model(&models.UserModel{}).Count(&total).WithContext(context)
 
 	if countOfItem.Error != nil {
 		return &dtos.Result[*dtos.PaginationResponse[*entities.User]]{
@@ -175,7 +206,7 @@ func (repository *UserRepository) FindAll(paginationRequest *dtos.PaginationRequ
 
 	totalPages := int(total / int64(paginationRequest.PageSize))
 
-	queryResult := repository.db.Model(&models.UserModel{}).Limit(paginationRequest.PageSize).Offset(offset).Find(&dataModels)
+	queryResult := repository.db.Model(&models.UserModel{}).Limit(paginationRequest.PageSize).Offset(offset).Find(&dataModels).WithContext(context)
 
 	if queryResult.Error != nil {
 		return &dtos.Result[*dtos.PaginationResponse[*entities.User]]{
@@ -197,11 +228,11 @@ func (repository *UserRepository) FindAll(paginationRequest *dtos.PaginationRequ
 
 }
 
-func (repository *UserRepository) IsExistById(id string) *dtos.Result[bool] {
+func (repository *UserRepository) IsExistById(id string, context context.Context) *dtos.Result[bool] {
 
 	var model *models.UserModel
 
-	queryResult := repository.db.First(model, "Id = ?", id)
+	queryResult := repository.db.First(model, "Id = ?", id).WithContext(context)
 
 	if queryResult.Error != nil || model == nil {
 		return &dtos.Result[bool]{
@@ -214,11 +245,11 @@ func (repository *UserRepository) IsExistById(id string) *dtos.Result[bool] {
 
 }
 
-func (repository *UserRepository) IsExistByUsername(username string) *dtos.Result[bool] {
+func (repository *UserRepository) IsExistByUsername(username string, context context.Context) *dtos.Result[bool] {
 
 	var model *models.UserModel
 
-	queryResult := repository.db.First(model, "Username = ?", username)
+	queryResult := repository.db.First(model, "Username = ?", username).WithContext(context)
 
 	if queryResult.Error != nil || model == nil {
 		return &dtos.Result[bool]{
@@ -231,11 +262,11 @@ func (repository *UserRepository) IsExistByUsername(username string) *dtos.Resul
 
 }
 
-func (repository *UserRepository) IsExistByPhoneNumber(phoneNumber string) *dtos.Result[bool] {
+func (repository *UserRepository) IsExistByPhoneNumber(phoneNumber string, context context.Context) *dtos.Result[bool] {
 
 	var model *models.UserModel
 
-	queryResult := repository.db.First(model, "PhoneNumber = ?", phoneNumber)
+	queryResult := repository.db.First(model, "PhoneNumber = ?", phoneNumber).WithContext(context)
 
 	if queryResult.Error != nil || model == nil {
 		return &dtos.Result[bool]{
@@ -248,11 +279,11 @@ func (repository *UserRepository) IsExistByPhoneNumber(phoneNumber string) *dtos
 
 }
 
-func (repository *UserRepository) IsExistByEmail(email string) *dtos.Result[bool] {
+func (repository *UserRepository) IsExistByEmail(email string, context context.Context) *dtos.Result[bool] {
 
 	var model *models.UserModel
 
-	queryResult := repository.db.First(model, "Email = ?", email)
+	queryResult := repository.db.First(model, "Email = ?", email).WithContext(context)
 
 	if queryResult.Error != nil || model == nil {
 		return &dtos.Result[bool]{

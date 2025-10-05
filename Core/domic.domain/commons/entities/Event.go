@@ -60,7 +60,7 @@ func NewEvent(idGenerator interfaces.IIdentityGenerator, name string, service st
 	payload string, createdAt time.Time,
 ) *Event {
 
-	id := idGenerator.GetRandom(4)
+	id := idGenerator.GetRandom(6)
 
 	return &Event{
 		id:        id,

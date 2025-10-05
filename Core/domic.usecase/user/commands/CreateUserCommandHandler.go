@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"context"
 	CommonInterface "domic.domain/commons/contracts/interfaces"
 	"domic.domain/commons/dtos"
 	UserInterface "domic.domain/user/contracts/contracts"
@@ -13,8 +14,9 @@ type CreateUserCommand struct {
 	LastName    string
 	Username    string
 	Password    string
-	PhoneNumber string
 	EMail       string
+	PhoneNumber string
+	ImageUrl    string
 	Description string
 	Roles       []string
 	Permissions []string
@@ -29,11 +31,11 @@ type CreateUserCommandHandler struct {
 	idGenerator CommonInterface.IIdentityGenerator
 }
 
-func (handler *CreateUserCommandHandler) Handle(command *CreateUserCommand) *dtos.Result[bool] {
+func (handler *CreateUserCommandHandler) Handle(command *CreateUserCommand, ctx context.Context) *dtos.Result[bool] {
 
 	//validation
 
-	validateResult := _commandValidation(command, handler.unitOfWork.UserRepository())
+	validateResult := _commandValidation(ctx, command, handler.unitOfWork.UserRepository())
 
 	if !validateResult.Result {
 		return validateResult
@@ -43,22 +45,22 @@ func (handler *CreateUserCommandHandler) Handle(command *CreateUserCommand) *dto
 
 	newUser := entities.NewUser(handler.idGenerator,
 		command.FirstName, command.LastName, command.Username, command.Password,
-		command.EMail, command.CreatedBy, command.CreatedRole,
+		command.EMail, command.PhoneNumber, command.ImageUrl, command.Description, command.CreatedBy, command.CreatedRole,
 	)
 
-	txResult := handler.unitOfWork.StartTransaction()
+	txResult := handler.unitOfWork.StartTransaction(ctx)
 
 	if !txResult.Result {
 		return txResult
 	}
 
-	handler.unitOfWork.EventRepository().AddRange(newUser.GetEvents())
-	handler.unitOfWork.UserRepository().Add(newUser)
+	handler.unitOfWork.EventRepository().AddRange(newUser.GetEvents(), ctx)
+	handler.unitOfWork.UserRepository().Add(newUser, ctx)
 
-	commitResult := handler.unitOfWork.Commit()
+	commitResult := handler.unitOfWork.Commit(ctx)
 
 	if !commitResult.Result {
-		return handler.unitOfWork.RollBack()
+		return handler.unitOfWork.RollBack(ctx)
 	}
 
 	return commitResult
@@ -76,9 +78,9 @@ func NewCreateUserCommandHandler(
 
 /*-------------------------------------------------------------------*/
 
-func _commandValidation(command *CreateUserCommand, repository UserInterface.IUserRepository) *dtos.Result[bool] {
+func _commandValidation(ctx context.Context, command *CreateUserCommand, repository UserInterface.IUserRepository) *dtos.Result[bool] {
 
-	targetUser := repository.IsExistByUsername(command.Username)
+	targetUser := repository.IsExistByUsername(command.Username, ctx)
 
 	if !targetUser.Result {
 		return &dtos.Result[bool]{
@@ -87,7 +89,7 @@ func _commandValidation(command *CreateUserCommand, repository UserInterface.IUs
 		}
 	}
 
-	targetUser = repository.IsExistByPhoneNumber(command.PhoneNumber)
+	targetUser = repository.IsExistByPhoneNumber(command.PhoneNumber, ctx)
 
 	if !targetUser.Result {
 		return &dtos.Result[bool]{
@@ -96,7 +98,7 @@ func _commandValidation(command *CreateUserCommand, repository UserInterface.IUs
 		}
 	}
 
-	targetUser = repository.IsExistByEmail(command.EMail)
+	targetUser = repository.IsExistByEmail(command.EMail, ctx)
 
 	if !targetUser.Result {
 		return &dtos.Result[bool]{

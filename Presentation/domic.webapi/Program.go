@@ -24,7 +24,8 @@ func main() {
 	server := grpc.NewServer()
 
 	userRpc.RegisterUserServiceServer(server, &endpoints.UserServer{
-		UnitOfWork: unitOfWork,
+		UnitOfWork:  unitOfWork,
+		IdGenerator: concretes.NewIdentityGenerator(),
 	})
 
 	log.Println("gRPC server listening on :1996")

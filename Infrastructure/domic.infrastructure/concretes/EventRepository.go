@@ -1,6 +1,7 @@
 package concretes
 
 import (
+	"context"
 	"domic.domain/commons/dtos"
 	"domic.domain/commons/entities"
 	"domic.persistence/models"
@@ -11,11 +12,11 @@ type EventRepository struct {
 	db *gorm.DB
 }
 
-func (repository *EventRepository) Add(entity *entities.Event) *dtos.Result[bool] {
+func (repository *EventRepository) Add(entity *entities.Event, ctx context.Context) *dtos.Result[bool] {
 
 	dataModel := models.ConvertEventEntityToModel(entity)
 
-	queryResult := repository.db.Model(&models.EventModel{}).Create(dataModel)
+	queryResult := repository.db.Model(&models.EventModel{}).Create(dataModel).WithContext(ctx)
 
 	if queryResult.Error != nil {
 		return &dtos.Result[bool]{
@@ -30,11 +31,11 @@ func (repository *EventRepository) Add(entity *entities.Event) *dtos.Result[bool
 
 }
 
-func (repository *EventRepository) AddRange(entities []*entities.Event) *dtos.Result[bool] {
+func (repository *EventRepository) AddRange(entities []*entities.Event, ctx context.Context) *dtos.Result[bool] {
 
 	dataModels := models.ConvertEventEntitiesToModels(entities)
 
-	queryResult := repository.db.Model(&models.EventModel{}).CreateInBatches(dataModels, len(entities))
+	queryResult := repository.db.Model(&models.EventModel{}).CreateInBatches(dataModels, len(entities)).WithContext(ctx)
 
 	if queryResult.Error != nil {
 		return &dtos.Result[bool]{
@@ -49,11 +50,11 @@ func (repository *EventRepository) AddRange(entities []*entities.Event) *dtos.Re
 
 }
 
-func (repository *EventRepository) Change(entity *entities.Event) *dtos.Result[bool] {
+func (repository *EventRepository) Change(entity *entities.Event, ctx context.Context) *dtos.Result[bool] {
 
 	dataModel := models.ConvertEventEntityToModel(entity)
 
-	queryResult := repository.db.Model(&models.EventModel{}).Updates(dataModel)
+	queryResult := repository.db.Model(&models.EventModel{}).Updates(dataModel).WithContext(ctx)
 
 	if queryResult.Error != nil {
 		return &dtos.Result[bool]{
@@ -68,13 +69,13 @@ func (repository *EventRepository) Change(entity *entities.Event) *dtos.Result[b
 
 }
 
-func (repository *EventRepository) ChangeRange(entities []*entities.Event) *dtos.Result[bool] {
+func (repository *EventRepository) ChangeRange(entities []*entities.Event, ctx context.Context) *dtos.Result[bool] {
 
 	var errors []error
 
 	for model := range models.ConvertEventEntitiesToModels(entities) {
 
-		queryResult := repository.db.Model(&models.EventModel{}).Updates(model)
+		queryResult := repository.db.Model(&models.EventModel{}).Updates(model).WithContext(ctx)
 
 		if queryResult.Error != nil {
 			errors = append(errors, queryResult.Error)
@@ -93,11 +94,11 @@ func (repository *EventRepository) ChangeRange(entities []*entities.Event) *dtos
 
 }
 
-func (repository *EventRepository) Remove(entity *entities.Event) *dtos.Result[bool] {
+func (repository *EventRepository) Remove(entity *entities.Event, ctx context.Context) *dtos.Result[bool] {
 
 	dataModel := models.ConvertEventEntityToModel(entity)
 
-	queryResult := repository.db.Model(&models.EventModel{}).Delete(dataModel, dataModel.Id)
+	queryResult := repository.db.Model(&models.EventModel{}).Delete(dataModel, dataModel.Id).WithContext(ctx)
 
 	if queryResult.Error != nil {
 		return &dtos.Result[bool]{
@@ -110,13 +111,13 @@ func (repository *EventRepository) Remove(entity *entities.Event) *dtos.Result[b
 
 }
 
-func (repository *EventRepository) RemoveRange(entities []*entities.Event) *dtos.Result[bool] {
+func (repository *EventRepository) RemoveRange(entities []*entities.Event, ctx context.Context) *dtos.Result[bool] {
 
 	var errors []error
 
 	for _, model := range models.ConvertEventEntitiesToModels(entities) {
 
-		queryResult := repository.db.Model(&models.EventModel{}).Delete(model, model.Id)
+		queryResult := repository.db.Model(&models.EventModel{}).Delete(model, model.Id).WithContext(ctx)
 
 		if queryResult.Error != nil {
 			errors = append(errors, queryResult.Error)
@@ -137,11 +138,11 @@ func (repository *EventRepository) RemoveRange(entities []*entities.Event) *dtos
 
 }
 
-func (repository *EventRepository) FindById(id string) *dtos.Result[*entities.Event] {
+func (repository *EventRepository) FindById(id string, ctx context.Context) *dtos.Result[*entities.Event] {
 
 	var model *models.EventModel
 
-	queryResult := repository.db.First(model, "id = ?", id)
+	queryResult := repository.db.First(model, "id = ?", id).WithContext(ctx)
 
 	if queryResult.Error != nil {
 		return &dtos.Result[*entities.Event]{
@@ -156,7 +157,7 @@ func (repository *EventRepository) FindById(id string) *dtos.Result[*entities.Ev
 
 }
 
-func (repository *EventRepository) FindAll(paginationRequest *dtos.PaginationRequest) *dtos.Result[*dtos.PaginationResponse[*entities.Event]] {
+func (repository *EventRepository) FindAll(paginationRequest *dtos.PaginationRequest, ctx context.Context) *dtos.Result[*dtos.PaginationResponse[*entities.Event]] {
 
 	offset := (paginationRequest.PageIndex - 1) * paginationRequest.PageSize
 
@@ -164,7 +165,7 @@ func (repository *EventRepository) FindAll(paginationRequest *dtos.PaginationReq
 
 	var dataModels []models.EventModel
 
-	countOfItem := repository.db.Model(&models.EventModel{}).Count(&total)
+	countOfItem := repository.db.Model(&models.EventModel{}).Count(&total).WithContext(ctx)
 
 	if countOfItem.Error != nil {
 		return &dtos.Result[*dtos.PaginationResponse[*entities.Event]]{
@@ -175,7 +176,7 @@ func (repository *EventRepository) FindAll(paginationRequest *dtos.PaginationReq
 
 	totalPages := int(total / int64(paginationRequest.PageSize))
 
-	queryResult := repository.db.Model(&models.EventModel{}).Limit(paginationRequest.PageSize).Offset(offset).Find(&dataModels)
+	queryResult := repository.db.Model(&models.EventModel{}).Limit(paginationRequest.PageSize).Offset(offset).Find(&dataModels).WithContext(ctx)
 
 	if queryResult.Error != nil {
 		return &dtos.Result[*dtos.PaginationResponse[*entities.Event]]{

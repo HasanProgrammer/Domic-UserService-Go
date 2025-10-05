@@ -1,6 +1,7 @@
 package concretes
 
 import (
+	"context"
 	CommonInterface "domic.domain/commons/contracts/interfaces"
 	"domic.domain/commons/dtos"
 	"domic.domain/user/contracts/contracts"
@@ -13,9 +14,9 @@ type UnitOfWork struct {
 	tx *gorm.DB
 }
 
-func (unitOfWork *UnitOfWork) StartTransaction() *dtos.Result[bool] {
+func (unitOfWork *UnitOfWork) StartTransaction(ctx context.Context) *dtos.Result[bool] {
 
-	unitOfWork.tx = unitOfWork.db.Begin()
+	unitOfWork.tx = unitOfWork.db.Begin().WithContext(ctx)
 
 	if unitOfWork.tx.Error != nil {
 		return &dtos.Result[bool]{
@@ -27,9 +28,9 @@ func (unitOfWork *UnitOfWork) StartTransaction() *dtos.Result[bool] {
 	return &dtos.Result[bool]{Result: true}
 }
 
-func (unitOfWork *UnitOfWork) Commit() *dtos.Result[bool] {
+func (unitOfWork *UnitOfWork) Commit(ctx context.Context) *dtos.Result[bool] {
 
-	commitResult := unitOfWork.tx.Commit()
+	commitResult := unitOfWork.tx.Commit().WithContext(ctx)
 
 	if commitResult.Error != nil {
 		return &dtos.Result[bool]{
@@ -42,9 +43,9 @@ func (unitOfWork *UnitOfWork) Commit() *dtos.Result[bool] {
 
 }
 
-func (unitOfWork *UnitOfWork) RollBack() *dtos.Result[bool] {
+func (unitOfWork *UnitOfWork) RollBack(ctx context.Context) *dtos.Result[bool] {
 
-	rollBackResult := unitOfWork.tx.Rollback()
+	rollBackResult := unitOfWork.tx.Rollback().WithContext(ctx)
 
 	if rollBackResult.Error != nil {
 		return &dtos.Result[bool]{
@@ -84,9 +85,7 @@ func NewUnitOfWork(connectionString string) (*UnitOfWork, error) {
 	})
 
 	if err == nil {
-		return &UnitOfWork{
-			db: db,
-		}, nil
+		return &UnitOfWork{db: db}, nil
 	}
 
 	return nil, err
