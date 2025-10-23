@@ -2,10 +2,11 @@ package concretes
 
 import (
 	"context"
-	CommonInterface "domic.domain/commons/contracts/interfaces"
+	CommonContract "domic.domain/commons/contracts/interfaces"
 	"domic.domain/commons/dtos"
-	RoleContracts "domic.domain/role/contracts/interfaces"
-	UserContracts "domic.domain/user/contracts/interfaces"
+	RoleContract "domic.domain/role/contracts/interfaces"
+	RoleUserContract "domic.domain/role_user/contracts/interfaces"
+	UserContract "domic.domain/user/contracts/interfaces"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )
@@ -29,7 +30,7 @@ func (unitOfWork *UnitOfWork) StartTransaction(ctx context.Context) *dtos.Result
 	return &dtos.Result[bool]{Result: true}
 }
 
-func (unitOfWork *UnitOfWork) Commit(ctx context.Context) *dtos.Result[bool] {
+func (unitOfWork *UnitOfWork) CommitTransaction(ctx context.Context) *dtos.Result[bool] {
 
 	commitResult := unitOfWork.tx.Commit().WithContext(ctx)
 
@@ -44,7 +45,7 @@ func (unitOfWork *UnitOfWork) Commit(ctx context.Context) *dtos.Result[bool] {
 
 }
 
-func (unitOfWork *UnitOfWork) RollBack(ctx context.Context) *dtos.Result[bool] {
+func (unitOfWork *UnitOfWork) RollBackTransaction(ctx context.Context) *dtos.Result[bool] {
 
 	rollBackResult := unitOfWork.tx.Rollback().WithContext(ctx)
 
@@ -59,7 +60,7 @@ func (unitOfWork *UnitOfWork) RollBack(ctx context.Context) *dtos.Result[bool] {
 
 }
 
-func (unitOfWork *UnitOfWork) RoleRepository() RoleContracts.IRoleRepository {
+func (unitOfWork *UnitOfWork) RoleRepository() RoleContract.IRoleRepository {
 
 	if unitOfWork.tx == nil {
 		return NewRoleRepository(unitOfWork.db)
@@ -69,7 +70,7 @@ func (unitOfWork *UnitOfWork) RoleRepository() RoleContracts.IRoleRepository {
 
 }
 
-func (unitOfWork *UnitOfWork) UserRepository() UserContracts.IUserRepository {
+func (unitOfWork *UnitOfWork) UserRepository() UserContract.IUserRepository {
 
 	if unitOfWork.tx == nil {
 		return NewUserRepository(unitOfWork.db)
@@ -79,7 +80,17 @@ func (unitOfWork *UnitOfWork) UserRepository() UserContracts.IUserRepository {
 
 }
 
-func (unitOfWork *UnitOfWork) EventRepository() CommonInterface.IEventRepository {
+func (unitOfWork *UnitOfWork) RoleUserRepository() RoleUserContract.IRoleUserRepository {
+
+	if unitOfWork.tx == nil {
+		return NewRoleUserRepository(unitOfWork.db)
+	} else {
+		return NewRoleUserRepository(unitOfWork.tx)
+	}
+
+}
+
+func (unitOfWork *UnitOfWork) EventRepository() CommonContract.IEventRepository {
 
 	if unitOfWork.tx == nil {
 		return NewEventRepository(unitOfWork.db)

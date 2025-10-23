@@ -68,9 +68,22 @@ func (server *UserServer) Create(ctx context.Context, req *userRpc.CreateRequest
 
 	handler := commands.NewCreateUserCommandHandler(server.UnitOfWork, server.IdGenerator)
 
-	handler.Handle(&command, ctx)
+	result := handler.Handle(&command, ctx)
 
-	return nil, nil
+	response := userRpc.CreateResponse{}
+
+	if result.Result {
+		response.Code = 200
+	} else {
+		response.Code = 400
+	}
+
+	response.Message = "عملیات ثبت کاربر با موفقیت انجام شد"
+	response.Body = &userRpc.CreateResponseBody{
+		UserId: "",
+	}
+
+	return &response, nil
 
 }
 
@@ -87,3 +100,5 @@ func (server *UserServer) Active(ctx context.Context, req *userRpc.ActiveRequest
 func (server *UserServer) InActive(ctx context.Context, req *userRpc.InActiveRequest) (*userRpc.InActiveResponse, error) {
 	return nil, nil
 }
+
+/*-------------------------------------------------------------------*/
