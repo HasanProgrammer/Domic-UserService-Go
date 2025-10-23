@@ -1,4 +1,4 @@
-package contracts
+package interfaces
 
 import (
 	"domic.domain/commons/contracts/interfaces"

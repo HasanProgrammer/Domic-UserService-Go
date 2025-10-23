@@ -89,12 +89,6 @@ func (repository *UserRepository) Change(entity *entities.User, context context.
 
 func (repository *UserRepository) ChangeRange(entities []*entities.User, context context.Context) *dtos.Result[bool] {
 
-	select {
-	case <-context.Done():
-		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
-	default:
-	}
-
 	var errors []error
 
 	for model := range models.ConvertUserEntitiesToModels(entities) {
@@ -119,12 +113,6 @@ func (repository *UserRepository) ChangeRange(entities []*entities.User, context
 }
 
 func (repository *UserRepository) Remove(entity *entities.User, context context.Context) *dtos.Result[bool] {
-
-	select {
-	case <-context.Done():
-		return &dtos.Result[bool]{Errors: []error{context.Err()}, Result: false}
-	default:
-	}
 
 	dataModel := models.ConvertUserEntityToModel(entity)
 

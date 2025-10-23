@@ -4,8 +4,8 @@ import (
 	"context"
 	CommonInterface "domic.domain/commons/contracts/interfaces"
 	"domic.domain/commons/dtos"
-	RoleContracts "domic.domain/role/contracts/contracts"
-	UserContracts "domic.domain/user/contracts/contracts"
+	RoleContracts "domic.domain/role/contracts/interfaces"
+	UserContracts "domic.domain/user/contracts/interfaces"
 	"gorm.io/driver/sqlserver"
 	"gorm.io/gorm"
 )

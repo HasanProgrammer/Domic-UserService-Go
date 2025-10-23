@@ -1,4 +1,4 @@
-package contracts
+package interfaces
 
 import (
 	"context"

@@ -1,6 +1,6 @@
 package helpers
 
-type JsonBody struct{}
+type JsonBody interface{}
 
 type JsonResponse struct {
 	Code    int32

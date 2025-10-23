@@ -5,7 +5,7 @@ import (
 	CommonInterface "domic.domain/commons/contracts/interfaces"
 	"domic.domain/commons/dtos"
 	RoleUser "domic.domain/role_user/entities"
-	UserInterface "domic.domain/user/contracts/contracts"
+	UserInterface "domic.domain/user/contracts/interfaces"
 	"domic.domain/user/entities"
 	"errors"
 )
@@ -68,10 +68,10 @@ func (handler *CreateUserCommandHandler) Handle(command *CreateUserCommand, ctx 
 
 	handler.unitOfWork.RoleUserRepository().AddRange(roleUsers, ctx)
 
-	commitResult := handler.unitOfWork.Commit(ctx)
+	commitResult := handler.unitOfWork.CommitTransaction(ctx)
 
 	if !commitResult.Result {
-		return handler.unitOfWork.RollBack(ctx)
+		return handler.unitOfWork.RollBackTransaction(ctx)
 	}
 
 	return commitResult

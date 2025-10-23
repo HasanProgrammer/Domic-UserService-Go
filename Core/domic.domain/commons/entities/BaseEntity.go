@@ -14,12 +14,12 @@ type BaseEntity struct {
 	updatedRole *string
 }
 
-func (b *BaseEntity) GetEvents() []*Event {
-	return b.events
-}
-
 func (b *BaseEntity) AppendEvent(event *Event) {
 	b.events = append(b.events, event)
+}
+
+func (b *BaseEntity) GetEvents() []*Event {
+	return b.events
 }
 
 func (b *BaseEntity) GetId() string {
